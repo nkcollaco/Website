@@ -1,0 +1,2 @@
+"0","project1 %>% ggplot()+geom_smooth(method='lm', se=FALSE, aes(x=PercentObese , y=PercentBachelors,color=`Rural/Urban`))+geom_point( aes(x=PercentObese , y=PercentBachelors ,color=`Rural/Urban`, size=Medianincome))+scale_x_continuous() +ggtitle(""Percent Bachelors vs Obesity Rate in Texas Counties"") +xlab(""Obesity Rate (%)"")+ylab(""% of County with Bachelors Degree"")+scale_color_brewer(palette = ""Paired"")"
+"0",""

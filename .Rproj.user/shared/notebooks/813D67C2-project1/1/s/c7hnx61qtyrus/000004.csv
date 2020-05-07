@@ -1,0 +1,24 @@
+"0","fulldata%>%select(County, `% Adults with Obesity`,`% Adults with Diabetes`,`Percent of adults with a bachelor's degree or higher, 2014-18` , `Median Household Income`, `% Rural`)->project1"
+"0",""
+"0","project1%>% slice(2:255)->project1"
+"0","project1%>% rename(PercentObese=`% Adults with Obesity`)%>% rename(PercentDiabetic=`% Adults with Diabetes`)%>%"
+"0","  rename(PercentBachelors=`Percent of adults with a bachelor's degree or higher, 2014-18`)%>%"
+"0","  rename(Medianincome=`Median Household Income`) %>% rename(pctRural=`% Rural`)->project1"
+"0","glimpse(project1)"
+"1","Rows: 254"
+"1",""
+"1","
+"
+"1","Columns: 6"
+"1",""
+"1","
+"
+"1","$ County           [3m[38;5;246m<chr>[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA...
+$ PercentObese     [3m[38;5;246m<dbl>[39m[23m 35.5, 35.5, 35.5, 35.5, 35.5, 35.5, 35.5, 35.5, 35.5, 35.5, 35.5, 35.5, 35.5, 35.5...
+$ PercentDiabetic  [3m[38;5;246m<dbl>[39m[23m 7.9, 9.7, 13.4, 8.6, 6.3, 8.9, 11.5, 8.1, 10.6, 11.8, 10.3, 8.9, 9.9, 11.9, 9.7, 1...
+$ PercentBachelors [3m[38;5;246m<dbl>[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA...
+$ Medianincome     [3m[38;5;246m<dbl>[39m[23m 74912, 59079, 47094, 75250, 71949, 76366, 65467, 82533, 55433, 58634, 80527, 55524...
+$ pctRural         [3m[38;5;246m<dbl>[39m[23m 33.980212, 10.190179, 43.839676, 5.047383, 13.847840, 12.007369, 16.703343, 0.0000..."
+"1",""
+"1","
+"

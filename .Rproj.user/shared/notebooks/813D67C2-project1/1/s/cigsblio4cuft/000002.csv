@@ -1,0 +1,3 @@
+"0",""
+"0","project1%>% ggplot(aes(x=`Rural/Urban`, y=PercentDiabetic,fill=`Rural/Urban`))+geom_bar(stat = ""summary"",fun.y=""mean"", width = .7)+geom_errorbar(stat=""summary"", width=.5)+theme(legend.position = ""none"") +ggtitle(""Mean Diabetic Percentage in Rural vs Urban Counties"") +scale_fill_brewer(palette=""Set1"")"
+"0",""

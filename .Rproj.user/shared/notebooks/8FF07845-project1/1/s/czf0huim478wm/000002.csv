@@ -1,0 +1,8 @@
+"0",""
+"0","clust_dat<-project1%>% select(2:6)"
+"0","sil_width<-vector()"
+"0","for(i in 2:10){    "
+"0","  pam_fit <- pam(clust_dat, k = i)    "
+"0","  sil_width[i] <- pam_fit$silinfo$avg.width  "
+"0","}"
+"0","ggplot()+geom_line(aes(x=1:10,y=sil_width))+scale_x_continuous(name=""k"",breaks=1:10) +ggtitle(""Silhouette Width vs Number of Clusters"")"

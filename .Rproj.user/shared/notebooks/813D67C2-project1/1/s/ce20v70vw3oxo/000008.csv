@@ -1,0 +1,5 @@
+"0","project1%>% count(`Rural/Urban`)
+"
+"0","pamclust<-clust_dat %>% mutate(cluster=as.factor(pamproject1$clustering))"
+"0","confmat<-pamclust%>%mutate(RuralUrban=project1$`Rural/Urban`)%>%group_by(RuralUrban)%>%count(cluster)%>% pivot_wider(names_from=""cluster"",values_from=""n"",values_fill = list('n'=0))"
+"0","confmat"

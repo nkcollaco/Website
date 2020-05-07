@@ -1,0 +1,2 @@
+"0","project1 %>% ggplot()+geom_point( aes(x=Medianincome , y=PercentBachelors,color=`Rural/Urban`, ))+scale_x_continuous()+geom_smooth(method='lm', se=FALSE, aes(x=Medianincome , y=PercentBachelors,color=`Rural/Urban`)) +ggtitle(""Percent Bachelors vs Median Income in Texas Counties"") +scale_x_continuous(labels=scales::dollar)+xlab(""Median Household Income"")+ylab(""% of County with Bachelors Degree"")+scale_y_continuous(breaks=seq(0, 50, 10))+scale_color_brewer(palette = ""Set1"")"
+"0",""

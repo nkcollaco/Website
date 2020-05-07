@@ -1,0 +1,6 @@
+"0",""
+"0","Education%>% filter(State==""TX"")->TXEducation"
+"0","TXEducation%>% rename(c(""County""=`Area name`))->TXEducation"
+"0","left_join(RankedMeasuredData, TXEducation, by=""County"")->partialdata"
+"0","left_join(partialdata, AdditionalMeasureData, by=""County"")->fulldata"
+"0","head(fulldata)"

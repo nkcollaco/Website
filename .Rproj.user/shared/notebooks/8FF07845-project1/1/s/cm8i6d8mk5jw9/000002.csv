@@ -1,0 +1,6 @@
+"0","plot(pamproject1)"
+"2","Error in eval(x$call[[2]], envir = parent.frame()) : object '.' not found
+"
+"2","Error in clusplot.partition(x, stand = stand, lines = lines, shade = shade,  : 
+  no diss nor data found, nor the original argument of pam(x = ., k = 2)
+"

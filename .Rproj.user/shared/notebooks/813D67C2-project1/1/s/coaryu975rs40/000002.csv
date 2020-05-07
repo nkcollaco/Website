@@ -1,0 +1,1 @@
+"0","project1 %>% summarise_at(2:5,funs(mean=mean, sd=sd, var=var, max=max, min=min))"

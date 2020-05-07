@@ -1,0 +1,2 @@
+"0","                         "
+"0","project1%>% group_by(`Rural/Urban`)%>%summarise_at(2:5,funs(""mean""=mean, ""sd""=sd, ""var""=var, ""max""=max, ""min""=min))%>% pivot_longer(contains(""_""))%>%separate(name,sep=""_"",into=c(""variable"",""Stat""))%>% pivot_wider(names_from = ""variable"",values_from=""value"")%>%arrange(Stat)"
