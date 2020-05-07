@@ -22,7 +22,7 @@ theme = "hugo-sustain"
 [params.social]
     Github        = "nkcollaco"
   Email         = "nkcollaco@gmail.com"
-  LinkedIn      = "www.linkedin.com/in/noahcollaco"
+  LinkedIn      = "noahcollaco"
 
 
 ## Main Menu
