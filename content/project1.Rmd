@@ -1,13 +1,12 @@
 ---
-title: "Project 1"
-author: "Noah Collaco nkc383"
-date: '3/13/2020'
-output:
-  pdf_document: default
-  html_document:
-  df_print: paged
+title: 'Project 1'
+author: 'Noah Collaco'
+date: "2020-05-06"
+slug: new-post
+categories: []
+tags: []
+description: ''
 ---
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = F, message = F,
 tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
