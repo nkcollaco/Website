@@ -1,11 +1,11 @@
 ---
-title: Learning Python!
+title: "Learning Python!"
 author: 'Noah Collaco '
 date: '2020-05-08'
-slug: learning-python
-categories: []
-tags: []
 description: ''
+slug: learning-python
+tags: []
+categories: []
 ---
 Both R and Python are very useful languages and both have their pros and cons. What is great about python is that many if not all of the statistical techniques learned this semester in R can be replicated in python. 
 ```{r setup, include=FALSE}
@@ -62,4 +62,6 @@ project2=r.project2
 sns.boxplot(x="RuralorUrban", y="pctDiabetes", data=project2)
 ```
 This shows a boxplot that was created using seaborn package in python.It shows the differences between percentage of a county's population with Diabetes and if the county is catagorized as mostly urban or mostly rural.Python has a wide variety of uses and can visualize data just like R can. 
-![](/blog/2020-05-08-learning-python_files/UT.JPG)
+![](/blog/2020-05-08-learning-python_files/UT.JPG) 
+
+
