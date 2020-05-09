@@ -11,8 +11,8 @@ slug: learning-python
 tags: []
 categories: []
 ---
-Both R and Python are very useful languages and both have their pros and cons. What is great about python is that many if not all of the statistical techniques learned this semester in R can be replicated in python. 
-![](/blog/2020-05-08-learning-python_files/capture.jpg)
+Both R and Python are very useful languages and both have their pros and cons. What is great about python is that many if not all of the statistical techniques learned this semester in R can be replicated in python.
+
 ```{r setup, include=FALSE}
 knitr::knit_engines$set(python= reticulate::eng_python)
 library(reticulate)
@@ -20,6 +20,8 @@ conda_list()
 use_python("	C:\\Users\\nkcol\\AppData\\Local\\r-miniconda\\python.exe")
 
 ```
+
+![](/blog/2020-05-08-learning-python_files/pic.png)
 
 ```{R}
 library(tidyverse)
