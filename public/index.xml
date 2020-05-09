@@ -17,7 +17,8 @@
       <pubDate>Fri, 08 May 2020 00:00:00 +0000</pubDate>
       
       <guid>/blog/learning-python/</guid>
-      <description>stuff for later</description>
+      <description>It is possible to do most if not all the things that we did this semester in Rstudio in python. Below I will show functions that were done in my projects and try to recreate them in python.
+library(tidyverse)## -- Attaching packages -------------------------------------------------------------------------------- tidyverse 1.3.0 --## v ggplot2 3.3.0 v purrr 0.3.3## v tibble 3.0.0 v dplyr 0.8.5## v tidyr 1.0.2 v stringr 1.4.0## v readr 1.</description>
     </item>
     
     <item>
