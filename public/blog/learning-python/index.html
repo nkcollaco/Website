@@ -61,7 +61,7 @@
         </div>
         <div class="blog-title">
           <h4>
-          May 8, 2020
+          May 9, 2020
             &nbsp;&nbsp;
             
           </h4>
@@ -72,7 +72,7 @@
               
 
 
-<p>It is possible to do most if not all the things that we did this semester in Rstudio in python. Below I will show functions that were done in my projects and try to recreate them in python.</p>
+<p>Both R and Python are very useful languages and both have their pros and cons. What is great about python is that many if not all of the statistical techniques learned this semester in R can be replicated in python.</p>
 <pre class="r"><code>library(tidyverse)</code></pre>
 <pre><code>## -- Attaching packages -------------------------------------------------------------------------------- tidyverse 1.3.0 --</code></pre>
 <pre><code>## v ggplot2 3.3.0     v purrr   0.3.3
@@ -125,66 +125,12 @@ AdditionalMeasureData%&gt;% filter(State==&quot;Texas&quot;)-&gt; AdditionalMeas
 TXEducation%&gt;% rename(c(&quot;County&quot;=`Area name`))-&gt;TXEducation
 left_join(RankedMeasuredData,TXEducation, by=&quot;County&quot;)-&gt;partialdata
 left_join(partialdata, AdditionalMeasureData, by=&quot;County&quot;)-&gt;fulldata
-head(fulldata)</code></pre>
-<pre><code>## # A tibble: 6 x 555
-##   FIPS.x State.x County Deaths `Years of Poten~ `95% CI - Low..~
-##   &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;   &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
-## 1 48000  Texas   &lt;NA&gt;   297317            6651.            6618.
-## 2 48001  Texas   Ander~   1130           10927.            9999.
-## 3 48003  Texas   Andre~    180            7138.            5774.
-## 4 48005  Texas   Angel~   1375            8914.            8221.
-## 5 48007  Texas   Arans~    492            8770.            7435.
-## 6 48009  Texas   Archer    125            8253.            5884.
-## # ... with 549 more variables: `95% CI - High...7` &lt;dbl&gt;, Quartile...8 &lt;dbl&gt;,
-## #   `YPLL Rate (AIAN)` &lt;dbl&gt;, `YPLL Rate (AIAN) 95% CI - Low` &lt;dbl&gt;, `YPLL Rate
-## #   (AIAN) 95% CI - High` &lt;dbl&gt;, `YPLL Rate (Asian)` &lt;dbl&gt;, `YPLL Rate (Asian)
-## #   95% CI - Low` &lt;dbl&gt;, `YPLL Rate (Asian) 95% CI - High` &lt;dbl&gt;, `YPLL Rate
-## #   (Black)` &lt;dbl&gt;, `YPLL Rate (Black) 95% CI - Low` &lt;dbl&gt;, `YPLL Rate (Black)
-## #   95% CI - High` &lt;dbl&gt;, `YPLL Rate (Hispanic)` &lt;dbl&gt;, `YPLL Rate (Hispanic)
-## #   95% CI - Low` &lt;dbl&gt;, `YPLL Rate (Hispanic) 95% CI - High` &lt;dbl&gt;, `YPLL Rate
-## #   (White)` &lt;dbl&gt;, `YPLL Rate (White) 95% CI - Low` &lt;dbl&gt;, `YPLL Rate (White)
-## #   95% CI - High` &lt;dbl&gt;, `% Fair or Poor Health` &lt;dbl&gt;, `95% CI -
-## #   Low...25` &lt;dbl&gt;, `95% CI - High...26` &lt;dbl&gt;, Quartile...27 &lt;dbl&gt;, `Average
-## #   Number of Physically Unhealthy Days` &lt;dbl&gt;, `95% CI - Low...29` &lt;dbl&gt;, `95%
-## #   CI - High...30` &lt;dbl&gt;, Quartile...31 &lt;dbl&gt;, `Average Number of Mentally
-## #   Unhealthy Days` &lt;dbl&gt;, `95% CI - Low...33` &lt;dbl&gt;, `95% CI -
-## #   High...34` &lt;dbl&gt;, Quartile...35 &lt;dbl&gt;, Unreliable &lt;chr&gt;, `% Low
-## #   Birthweight` &lt;dbl&gt;, `95% CI - Low...38` &lt;dbl&gt;, `95% CI - High...39` &lt;dbl&gt;,
-## #   Quartile...40 &lt;dbl&gt;, `% LBW (AIAN)` &lt;dbl&gt;, `% LBW (AIAN) 95% CI -
-## #   Low` &lt;dbl&gt;, `% LBW (AIAN) 95% CI - High` &lt;dbl&gt;, `% LBW (Asian)` &lt;dbl&gt;, `%
-## #   LBW (Asian) 95% CI - Low` &lt;dbl&gt;, `% LBW (Asian) 95% CI - High` &lt;dbl&gt;, `%
-## #   LBW (Black)` &lt;dbl&gt;, `% LBW (Black) 95% CI - Low` &lt;dbl&gt;, `% LBW (Black) 95%
-## #   CI - High` &lt;dbl&gt;, `% LBW (Hispanic)` &lt;dbl&gt;, `% LBW (Hispanic) 95% CI -
-## #   Low` &lt;dbl&gt;, `% LBW (Hispanic) 95% CI - High` &lt;dbl&gt;, `% LBW (White)` &lt;dbl&gt;,
-## #   `% LBW (White) 95% CI - Low` &lt;dbl&gt;, `% LBW (White) 95% CI - High` &lt;dbl&gt;, `%
-## #   Smokers` &lt;dbl&gt;, `95% CI - Low...57` &lt;dbl&gt;, `95% CI - High...58` &lt;dbl&gt;,
-## #   Quartile...59 &lt;dbl&gt;, `% Adults with Obesity` &lt;dbl&gt;, `95% CI -
-## #   Low...61` &lt;dbl&gt;, `95% CI - High...62` &lt;dbl&gt;, Quartile...63 &lt;dbl&gt;, `Food
-## #   Environment Index` &lt;dbl&gt;, Quartile...65 &lt;dbl&gt;, `% Physically
-## #   Inactive` &lt;dbl&gt;, `95% CI - Low...67` &lt;dbl&gt;, `95% CI - High...68` &lt;dbl&gt;,
-## #   Quartile...69 &lt;dbl&gt;, `% With Access to Exercise Opportunities` &lt;dbl&gt;,
-## #   Quartile...71 &lt;dbl&gt;, `% Excessive Drinking` &lt;dbl&gt;, `95% CI -
-## #   Low...73` &lt;dbl&gt;, `95% CI - High...74` &lt;dbl&gt;, Quartile...75 &lt;dbl&gt;, `#
-## #   Alcohol-Impaired Driving Deaths` &lt;dbl&gt;, `# Driving Deaths` &lt;dbl&gt;, `%
-## #   Driving Deaths with Alcohol Involvement` &lt;dbl&gt;, `95% CI - Low...79` &lt;dbl&gt;,
-## #   `95% CI - High...80` &lt;dbl&gt;, Quartile...81 &lt;dbl&gt;, `# Chlamydia Cases` &lt;dbl&gt;,
-## #   `Chlamydia Rate` &lt;dbl&gt;, Quartile...84 &lt;dbl&gt;, `Teen Birth Rate` &lt;dbl&gt;, `95%
-## #   CI - Low...86.x` &lt;dbl&gt;, `95% CI - High...87.x` &lt;dbl&gt;, Quartile...88 &lt;dbl&gt;,
-## #   `Teen Birth Rate (AIAN)` &lt;dbl&gt;, `Teen Birth Rate (AIAN) 95% CI -
-## #   Low` &lt;dbl&gt;, `Teen Birth Rate (AIAN) 95% CI - High` &lt;dbl&gt;, `Teen Birth Rate
-## #   (Asian)` &lt;dbl&gt;, `Teen Birth Rate (Asian) 95% CI - Low` &lt;dbl&gt;, `Teen Birth
-## #   Rate (Asian) 95% CI - High` &lt;dbl&gt;, `Teen Birth Rate (Black)` &lt;dbl&gt;, `Teen
-## #   Birth Rate (Black) 95% CI - Low` &lt;dbl&gt;, `Teen Birth Rate (Black) 95% CI -
-## #   High` &lt;dbl&gt;, `Teen Birth Rate (Hispanic)` &lt;dbl&gt;, `Teen Birth Rate
-## #   (Hispanic) 95% CI - Low` &lt;dbl&gt;, `Teen Birth Rate (Hispanic) 95% CI -
-## #   High` &lt;dbl&gt;, `Teen Birth Rate (White)` &lt;dbl&gt;, `Teen Birth Rate (White) 95%
-## #   CI - Low` &lt;dbl&gt;, `Teen Birth Rate (White) 95% CI - High` &lt;dbl&gt;, `#
-## #   Uninsured` &lt;dbl&gt;, `% Uninsured` &lt;dbl&gt;, `95% CI - Low...106` &lt;dbl&gt;, ...</code></pre>
-<pre class="r"><code>fulldata%&gt;%select(County,`Life Expectancy`,`% Adults with Obesity`,`% Physically Inactive`,`% Smokers`,`% Food Insecure`,`% Uninsured`,`% Adults with Diabetes`,`Percent of adults with a bachelor&#39;s degree or higher, 2014-18` , `Median Household Income`, `% Insufficient Sleep`,`% Excessive Drinking`,`% Rural`)-&gt;project2
+
+fulldata%&gt;%select(County,`Life Expectancy`,`% Adults with Obesity`,`% Physically Inactive`,`% Smokers`,`% Food Insecure`,`% Uninsured`,`% Adults with Diabetes`,`Percent of adults with a bachelor&#39;s degree or higher, 2014-18` , `Median Household Income`, `% Insufficient Sleep`,`% Excessive Drinking`,`% Rural`)-&gt;project2
 project2%&gt;% na.omit()-&gt;project2
 project2%&gt;% rename(Lifeexpt=`Life Expectancy`)%&gt;% rename(pctObese=`% Adults with Obesity`)%&gt;% rename(pctInactive=`% Physically Inactive`)%&gt;% rename(pctFDInsecure=`% Food Insecure`)%&gt;% rename(pctSmokers=`% Smokers`)%&gt;% rename(pctUninsured=`% Uninsured`)%&gt;% rename(pctDiabetes=`% Adults with Diabetes`)%&gt;% rename(pctBachelors=`Percent of adults with a bachelor&#39;s degree or higher, 2014-18`)%&gt;% rename(medianincome=`Median Household Income`)%&gt;% rename(pctinsufficientsleep=`% Insufficient Sleep`)%&gt;% rename(pctRural=`% Rural`)%&gt;% rename(pctexcessdrinking=`% Excessive Drinking`)-&gt;project2
-project2%&gt;% mutate(`Rural/Urban`=if_else(pctRural&gt;50, &quot;Mostly Rural&quot;, &quot;Mostly Urban&quot;))-&gt;project2</code></pre>
-<p>This is the data that was used in project two. I performed a linear regression an example to show how python and rstudio can both be used to perform statistical analysis.</p>
+project2%&gt;% mutate(RuralorUrban=if_else(pctRural&gt;50, &quot;Mostly Rural&quot;, &quot;Mostly Urban&quot;))-&gt;project2</code></pre>
+<p>This is the data that was used in project 2. I performed a linear regression in both R and in python.</p>
 <pre class="r"><code>fit1&lt;-lm(Lifeexpt~pctObese ,data=project2)
 summary(fit1)</code></pre>
 <pre><code>## 
@@ -208,6 +154,7 @@ summary(fit1)</code></pre>
 <pre class="python"><code>import pandas as pd
 import numpy as np
 from statsmodels.formula.api import ols
+
 project2= r.project2
 fit= ols(&quot;Lifeexpt~pctObese&quot;, data=project2).fit()
 fit.summary()</code></pre>
@@ -219,7 +166,7 @@ fit.summary()</code></pre>
 ## Model:                            OLS   Adj. R-squared:                  0.075
 ## Method:                 Least Squares   F-statistic:                     20.16
 ## Date:                Sat, 09 May 2020   Prob (F-statistic):           1.11e-05
-## Time:                        15:06:16   Log-Likelihood:                -535.07
+## Time:                        16:41:53   Log-Likelihood:                -535.07
 ## No. Observations:                 237   AIC:                             1074.
 ## Df Residuals:                     235   BIC:                             1081.
 ## Df Model:                           1                                         

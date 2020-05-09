@@ -3,20 +3,22 @@ title: "Learning Python!"
 author: 'Noah Collaco '
 date: '2020-05-09'
 output:
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
 description: ''
 slug: learning-python
 tags: []
 categories: []
 ---
 Both R and Python are very useful languages and both have their pros and cons. What is great about python is that many if not all of the statistical techniques learned this semester in R can be replicated in python. 
+![](/blog/2020-05-08-learning-python_files/capture.jpg)
 ```{r setup, include=FALSE}
 knitr::knit_engines$set(python= reticulate::eng_python)
 library(reticulate)
-py_install("seaborn")
-use_python("C:\\Users\\nkcol\\AppData\\Local\\r-miniconda\\envs\\r-reticulate\\python.exe")
+conda_list()
+use_python("	C:\\Users\\nkcol\\AppData\\Local\\r-miniconda\\python.exe")
+
 ```
 
 ```{R}
@@ -63,4 +65,6 @@ fit.summary()
 This code shows linear regression of Life expectancy to percent Obesity in Texas counties. The linear regression was performed in both R and in python showing just one of the many similar ways R and python can be used. They both showed a significant negative relationship between obesity and life expectancy. Showing that each percentage increase of obesity results in a decrease of -.131 years. 
 
 
+Just for fun here's one of my favorite photos I've taken at UT! 
+![](/blog/2020-05-08-learning-python_files/UT.JPG)
 
