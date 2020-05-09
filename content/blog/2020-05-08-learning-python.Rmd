@@ -2,6 +2,10 @@
 title: "Learning Python!"
 author: 'Noah Collaco '
 date: '2020-05-09'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 description: ''
 slug: learning-python
 tags: []
@@ -11,6 +15,7 @@ Both R and Python are very useful languages and both have their pros and cons. W
 ```{r setup, include=FALSE}
 knitr::knit_engines$set(python= reticulate::eng_python)
 library(reticulate)
+py_install("seaborn")
 use_python("C:\\Users\\nkcol\\AppData\\Local\\r-miniconda\\envs\\r-reticulate\\python.exe")
 ```
 
@@ -49,19 +54,13 @@ summary(fit1)
 import pandas as pd
 import numpy as np
 from statsmodels.formula.api import ols
+
 project2= r.project2
 fit= ols("Lifeexpt~pctObese", data=project2).fit()
 fit.summary()
 
 ```
 This code shows linear regression of Life expectancy to percent Obesity in Texas counties. The linear regression was performed in both R and in python showing just one of the many similar ways R and python can be used. They both showed a significant negative relationship between obesity and life expectancy. Showing that each percentage increase of obesity results in a decrease of -.131 years. 
-```{python}
-import matplotlib.pyplot as plt
-import seaborn as sns
-project2=r.project2
-sns.boxplot(x="RuralorUrban", y="pctDiabetes", data=project2)
-```
-This shows a boxplot that was created using seaborn package in python.It shows the differences between percentage of a county's population with Diabetes and if the county is catagorized as mostly urban or mostly rural.Python has a wide variety of uses and can visualize data just like R can. 
-![](/blog/2020-05-08-learning-python_files/UT.JPG) 
+
 
 
