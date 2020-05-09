@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en-US">
   <head>
+    <link rel="apple-touch-icon" sizes="180x180" href="content/favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="content/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="content/favicon/favicon-16x16.png">
+<link rel="manifest" href="content/favicon/site.webmanifest">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Noah Collaco" />
     <meta name="description" content="Describe your website">
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
-    <title>Project 2</title>
+    <title>Project 1</title>
     <meta name="generator" content="Hugo 0.70.0" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/css/main.css" />
@@ -56,7 +60,7 @@
       <div class="container">
         <div class="blog-post">
           <h3>
-            <strong><a href="/new-post/">Project 2</a></strong>
+            <strong><a href="/new-post/">Project 1</a></strong>
           </h3>
         </div>
         <div class="blog-title">
@@ -72,652 +76,954 @@
               
 
 
-<div id="noah-collaco-nkc383" class="section level1">
-<h1>Noah Collaco nkc383</h1>
-<pre class="r"><code>class_diag &lt;- function(probs,truth){
-  
-  #CONFUSION MATRIX: CALCULATE ACCURACY, TPR, TNR, PPV
-  tab&lt;-table(factor(probs&gt;.5,levels=c(&quot;FALSE&quot;,&quot;TRUE&quot;)),truth)
-  acc=sum(diag(tab))/sum(tab)
-  sens=tab[2,2]/colSums(tab)[2]
-  spec=tab[1,1]/colSums(tab)[1]
-  ppv=tab[2,2]/rowSums(tab)[2]
-
-  if(is.numeric(truth)==FALSE &amp; is.logical(truth)==FALSE) truth&lt;-as.numeric(truth)-1
-  
-  #CALCULATE EXACT AUC
-  ord&lt;-order(probs, decreasing=TRUE)
-  probs &lt;- probs[ord]; truth &lt;- truth[ord]
-  
-  TPR=cumsum(truth)/max(1,sum(truth)) 
-  FPR=cumsum(!truth)/max(1,sum(!truth))
-  
-  dup&lt;-c(probs[-1]&gt;=probs[-length(probs)], FALSE)
-  TPR&lt;-c(0,TPR[!dup],1); FPR&lt;-c(0,FPR[!dup],1)
-  
-  n &lt;- length(TPR)
-  auc&lt;- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
-
-  data.frame(acc,sens,spec,ppv,auc)
-}</code></pre>
-<pre class="r"><code>library(readxl)
-RankedMeasuredData &lt;- read_excel(&quot;2020 County Health Rankings Data - v1.xlsx&quot;, 
+<div id="r-markdown" class="section level2">
+<h2>R Markdown</h2>
+<pre class="r"><code>library(tidyverse)
+library(readxl)
+library(kableExtra)
+library(GGally)
+library(cluster)
+Education &lt;- read_excel(&quot;Education2.xls&quot;, skip = 4)
+RankedMeasureData &lt;- read_excel(&quot;2019 County Health Rankings Texas Data - v1_0.xls&quot;, 
     sheet = &quot;Ranked Measure Data&quot;)
-AdditionalMeasureData &lt;- read_excel(&quot;2020 County Health Rankings Data - v1.xlsx&quot;, 
-    sheet = &quot;Additional Measure Data&quot;)
-Education &lt;- read_excel(&quot;Education.xls&quot;)
-Education%&gt;% filter(State==&quot;TX&quot;)-&gt;TXEducation
-RankedMeasuredData%&gt;% filter(State==&quot;Texas&quot;)-&gt; RankedMeasuredData
-AdditionalMeasureData%&gt;% filter(State==&quot;Texas&quot;)-&gt; AdditionalMeasureData
-TXEducation%&gt;% rename(c(&quot;County&quot;=`Area name`))-&gt;TXEducation
-left_join(RankedMeasuredData,TXEducation, by=&quot;County&quot;)-&gt;partialdata
-left_join(partialdata, AdditionalMeasureData, by=&quot;County&quot;)-&gt;fulldata
+AdditionalMeasureData &lt;- read_excel(&quot;2019 County Health Rankings Texas Data - v1_0.xls&quot;, 
+    sheet = &quot;Additional Measure Data&quot;)</code></pre>
+<p>This project uses data from the 2019 County Health Rankings for Texas and the USDA ERS Educational Attainment Data. These datasets are large so specific variables of County Name, % Obese, % Diabetic, Percent of a County with a Bachelors Degree, Median Household Income, and % Rural of a County were taken.</p>
+<pre class="r"><code>TXEducation &lt;- Education %&gt;% filter(State == &quot;TX&quot;)
+TXEducation &lt;- TXEducation %&gt;% rename(c(County = `Area name`))
+partialdata &lt;- left_join(RankedMeasureData, TXEducation, by = &quot;County&quot;)
+fulldata &lt;- left_join(partialdata, AdditionalMeasureData, by = &quot;County&quot;)
 head(fulldata)</code></pre>
-<pre><code>## # A tibble: 6 x 555
-## FIPS.x State.x County Deaths `Years of Poten~ `95% CI -
-Low..~ `95% CI - High.~ Quartile...8
-## &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-## 1 48000 Texas &lt;NA&gt; 297317 6651.  6618.  6684.  NA
-## 2 48001 Texas Ander~ 1130 10927.  9999.  11855.  4
-## 3 48003 Texas Andre~ 180 7138.  5774.  8501.  1
-## 4 48005 Texas Angel~ 1375 8914.  8221.  9607.  3
-## 5 48007 Texas Arans~ 492 8770.  7435.  10105.  3
-## 6 48009 Texas Archer 125 8253.  5884.  10623.  2
-## # ... with 547 more variables: `YPLL Rate (AIAN)` &lt;dbl&gt;,
-`YPLL Rate (AIAN) 95% CI - Low` &lt;dbl&gt;,
-## # `YPLL Rate (AIAN) 95% CI - High` &lt;dbl&gt;, `YPLL Rate
-(Asian)` &lt;dbl&gt;, `YPLL Rate (Asian) 95% CI -
-## # Low` &lt;dbl&gt;, `YPLL Rate (Asian) 95% CI - High` &lt;dbl&gt;,
-`YPLL Rate (Black)` &lt;dbl&gt;, `YPLL Rate
-## # (Black) 95% CI - Low` &lt;dbl&gt;, `YPLL Rate (Black) 95% CI
-- High` &lt;dbl&gt;, `YPLL Rate
-## # (Hispanic)` &lt;dbl&gt;, `YPLL Rate (Hispanic) 95% CI - Low`
-&lt;dbl&gt;, `YPLL Rate (Hispanic) 95% CI -
-## # High` &lt;dbl&gt;, `YPLL Rate (White)` &lt;dbl&gt;, `YPLL Rate
-(White) 95% CI - Low` &lt;dbl&gt;, `YPLL Rate
-## # (White) 95% CI - High` &lt;dbl&gt;, `% Fair or Poor Health`
-&lt;dbl&gt;, `95% CI - Low...25` &lt;dbl&gt;, `95% CI
-## # - High...26` &lt;dbl&gt;, Quartile...27 &lt;dbl&gt;, `Average
-Number of Physically Unhealthy Days` &lt;dbl&gt;,
-## # `95% CI - Low...29` &lt;dbl&gt;, `95% CI - High...30` &lt;dbl&gt;,
-Quartile...31 &lt;dbl&gt;, `Average Number of
-## # Mentally Unhealthy Days` &lt;dbl&gt;, `95% CI - Low...33`
-&lt;dbl&gt;, `95% CI - High...34` &lt;dbl&gt;,
-## # Quartile...35 &lt;dbl&gt;, Unreliable &lt;chr&gt;, `% Low
-Birthweight` &lt;dbl&gt;, `95% CI - Low...38` &lt;dbl&gt;,
-## # `95% CI - High...39` &lt;dbl&gt;, Quartile...40 &lt;dbl&gt;, `%
-LBW (AIAN)` &lt;dbl&gt;, `% LBW (AIAN) 95% CI -
-## # Low` &lt;dbl&gt;, `% LBW (AIAN) 95% CI - High` &lt;dbl&gt;, `% LBW
-(Asian)` &lt;dbl&gt;, `% LBW (Asian) 95% CI -
-## # Low` &lt;dbl&gt;, `% LBW (Asian) 95% CI - High` &lt;dbl&gt;, `%
-LBW (Black)` &lt;dbl&gt;, `% LBW (Black) 95% CI -
-## # Low` &lt;dbl&gt;, `% LBW (Black) 95% CI - High` &lt;dbl&gt;, `%
-LBW (Hispanic)` &lt;dbl&gt;, `% LBW (Hispanic)
-## # 95% CI - Low` &lt;dbl&gt;, `% LBW (Hispanic) 95% CI - High`
-&lt;dbl&gt;, `% LBW (White)` &lt;dbl&gt;, `% LBW
-## # (White) 95% CI - Low` &lt;dbl&gt;, `% LBW (White) 95% CI -
-High` &lt;dbl&gt;, `% Smokers` &lt;dbl&gt;, `95% CI -
-## # Low...57` &lt;dbl&gt;, `95% CI - High...58` &lt;dbl&gt;,
-Quartile...59 &lt;dbl&gt;, `% Adults with
-## # Obesity` &lt;dbl&gt;, `95% CI - Low...61` &lt;dbl&gt;, `95% CI -
-High...62` &lt;dbl&gt;, Quartile...63 &lt;dbl&gt;,
-## # `Food Environment Index` &lt;dbl&gt;, Quartile...65 &lt;dbl&gt;,
-`% Physically Inactive` &lt;dbl&gt;, `95% CI -
-## # Low...67` &lt;dbl&gt;, `95% CI - High...68` &lt;dbl&gt;,
-Quartile...69 &lt;dbl&gt;, `% With Access to Exercise
-## # Opportunities` &lt;dbl&gt;, Quartile...71 &lt;dbl&gt;, `%
-Excessive Drinking` &lt;dbl&gt;, `95% CI -
-## # Low...73` &lt;dbl&gt;, `95% CI - High...74` &lt;dbl&gt;,
-Quartile...75 &lt;dbl&gt;, `# Alcohol-Impaired Driving
-## # Deaths` &lt;dbl&gt;, `# Driving Deaths` &lt;dbl&gt;, `% Driving
-Deaths with Alcohol Involvement` &lt;dbl&gt;,
-## # `95% CI - Low...79` &lt;dbl&gt;, `95% CI - High...80` &lt;dbl&gt;,
-Quartile...81 &lt;dbl&gt;, `# Chlamydia
-## # Cases` &lt;dbl&gt;, `Chlamydia Rate` &lt;dbl&gt;, Quartile...84
-&lt;dbl&gt;, `Teen Birth Rate` &lt;dbl&gt;, `95% CI -
-## # Low...86.x` &lt;dbl&gt;, `95% CI - High...87.x` &lt;dbl&gt;,
-Quartile...88 &lt;dbl&gt;, `Teen Birth Rate
-## # (AIAN)` &lt;dbl&gt;, `Teen Birth Rate (AIAN) 95% CI - Low`
-&lt;dbl&gt;, `Teen Birth Rate (AIAN) 95% CI -
-## # High` &lt;dbl&gt;, `Teen Birth Rate (Asian)` &lt;dbl&gt;, `Teen
-Birth Rate (Asian) 95% CI - Low` &lt;dbl&gt;,
-## # `Teen Birth Rate (Asian) 95% CI - High` &lt;dbl&gt;, `Teen
-Birth Rate (Black)` &lt;dbl&gt;, `Teen Birth
-## # Rate (Black) 95% CI - Low` &lt;dbl&gt;, `Teen Birth Rate
-(Black) 95% CI - High` &lt;dbl&gt;, `Teen Birth
-## # Rate (Hispanic)` &lt;dbl&gt;, `Teen Birth Rate (Hispanic)
-95% CI - Low` &lt;dbl&gt;, `Teen Birth Rate
-## # (Hispanic) 95% CI - High` &lt;dbl&gt;, `Teen Birth Rate
-(White)` &lt;dbl&gt;, `Teen Birth Rate (White) 95%
-## # CI - Low` &lt;dbl&gt;, `Teen Birth Rate (White) 95% CI -
-High` &lt;dbl&gt;, `# Uninsured` &lt;dbl&gt;, `%
-## # Uninsured` &lt;dbl&gt;, `95% CI - Low...106` &lt;dbl&gt;, `95% CI
-- High...107` &lt;dbl&gt;,
-## # Quartile...108 &lt;dbl&gt;, ...</code></pre>
-<pre class="r"><code>fulldata%&gt;%select(County,`Life Expectancy`,`% Adults with Obesity`,`% Physically Inactive`,`% Smokers`,`% Food Insecure`,`% Uninsured`,`% Adults with Diabetes`,`Percent of adults with a bachelor&#39;s degree or higher, 2014-18` , `Median Household Income`, `% Insufficient Sleep`,`% Excessive Drinking`,`% Rural`)-&gt;project2
-project2%&gt;% na.omit()-&gt;project2
-project2%&gt;% rename(Lifeexpt=`Life Expectancy`)%&gt;% rename(pctObese=`% Adults with Obesity`)%&gt;% rename(pctInactive=`% Physically Inactive`)%&gt;% rename(pctFDInsecure=`% Food Insecure`)%&gt;% rename(pctSmokers=`% Smokers`)%&gt;% rename(pctUninsured=`% Uninsured`)%&gt;% rename(pctDiabetes=`% Adults with Diabetes`)%&gt;% rename(pctBachelors=`Percent of adults with a bachelor&#39;s degree or higher, 2014-18`)%&gt;% rename(medianincome=`Median Household Income`)%&gt;% rename(pctinsufficientsleep=`% Insufficient Sleep`)%&gt;% rename(pctRural=`% Rural`)%&gt;% rename(pctexcessdrinking=`% Excessive Drinking`)-&gt;project2
-project2%&gt;% mutate(`Rural/Urban`=if_else(pctRural&gt;50, &quot;Mostly Rural&quot;, &quot;Mostly Urban&quot;))-&gt;project2
-glimpse(project2)</code></pre>
-<pre><code>## Rows: 237
-## Columns: 14
-## $ County &lt;chr&gt; &quot;Anderson&quot;, &quot;Andrews&quot;, &quot;Angelina&quot;,
-&quot;Aransas&quot;, &quot;Archer&quot;, &quot;Armstrong...
-## $ Lifeexpt &lt;dbl&gt; 73.35175, 77.45956, 76.13033, 77.87665,
-78.79405, 77.35534, 78.256...
-## $ pctObese &lt;dbl&gt; 36.5, 34.9, 40.7, 40.5, 26.8, 29.3,
-36.7, 31.5, 31.3, 29.9, 38.4, ...
-## $ pctInactive &lt;dbl&gt; 23.1, 26.4, 34.5, 36.3, 19.3, 23.2,
-32.1, 29.3, 24.6, 27.8, 23.9, ...
-## $ pctSmokers &lt;dbl&gt; 17.38632, 13.43630, 15.85697,
-14.15745, 14.06261, 11.74955, 14.394...
-## $ pctFDInsecure &lt;dbl&gt; 18.2, 8.4, 18.9, 16.5, 14.0, 13.1,
-8.8, 14.7, 11.2, 14.5, 12.5, 16...
-## $ pctUninsured &lt;dbl&gt; 19.60253, 22.05352, 21.65754,
-22.30243, 18.97821, 17.61442, 19.019...
-## $ pctDiabetes &lt;dbl&gt; 10.4, 6.7, 14.3, 18.7, 11.5, 9.2,
-17.1, 10.4, 6.1, 8.6, 11.7, 11.7...
-## $ pctBachelors &lt;dbl&gt; 11.7, 10.4, 16.3, 21.7, 23.4, 23.2,
-13.3, 23.5, 17.7, 23.8, 20.4, ...
-## $ medianincome &lt;dbl&gt; 45969, 84946, 46653, 46912, 61190,
-57210, 50594, 59942, 45051, 530...
-## $ pctinsufficientsleep &lt;dbl&gt; 35.24732, 31.74921,
-34.79908, 30.29583, 28.97682, 28.68410, 33.031...
-## $ pctexcessdrinking &lt;dbl&gt; 19.23829, 20.11543, 15.73896,
-15.89121, 19.25183, 19.84931, 17.596...
-## $ pctRural &lt;dbl&gt; 67.063533, 16.502097, 43.082366,
-27.260558, 88.988292, 100.000000,...
-## $ `Rural/Urban` &lt;chr&gt; &quot;Mostly Rural&quot;, &quot;Mostly Urban&quot;,
-&quot;Mostly Urban&quot;, &quot;Mostly Urban&quot;, &quot;M...</code></pre>
-<p>This project uses data from the 2019 County Health Rankings for Texas and the USDA ERS Educational Attainment Data.. Each of the data sources were filtered for Texas counties. I wanted to compared how different variables affected Life Expectancy within a county. The variables that were chosen were Obesity Rate, Inactivty Rate, Smoking Rate, Food Insecurity Rate, percent Uninsured, Diabetes Rate, Percent of a county with a bachelors degree, Food Environemnt Index, Percen Insufficient Sleep, percent Excessive drinking, and Percent Rural. The dataset was then filtered to get rid of NAs as there were some counties without measurements for Life Expectancy. This brought down the number of observations from 254 counties to 237 counties.The percent Rural variable was also mutated to be a categorical variable of Mostly Rural and Mostly Urban.</p>
-</div>
-<div id="manova" class="section level1">
-<h1>Manova</h1>
-<pre class="r"><code>man1&lt;-manova(cbind(Lifeexpt, pctObese, pctInactive, pctSmokers, pctFDInsecure, pctDiabetes,pctBachelors,medianincome,pctinsufficientsleep,pctexcessdrinking )~`Rural/Urban`, data=project2)
-summary(man1)</code></pre>
-<pre><code>## Df Pillai approx F num Df den Df Pr(&gt;F)
-## `Rural/Urban` 1 0.32366 10.815 10 226 5.645e-15 ***
-## Residuals 235
-## ---
-## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
-&#39; &#39; 1</code></pre>
-<pre class="r"><code>summary.aov(man1)</code></pre>
-<pre><code>## Response Lifeexpt :
-## Df Sum Sq Mean Sq F value Pr(&gt;F)
-## `Rural/Urban` 1 40.86 40.859 7.185 0.007872 **
-## Residuals 235 1336.37 5.687
-## ---
-## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
-&#39; &#39; 1
-##
-## Response pctObese :
-## Df Sum Sq Mean Sq F value Pr(&gt;F)
-## `Rural/Urban` 1 4.4 4.4172 0.1638 0.6861
-## Residuals 235 6338.3 26.9717
-##
-## Response pctInactive :
-## Df Sum Sq Mean Sq F value Pr(&gt;F)
-## `Rural/Urban` 1 111.8 111.81 5.1886 0.02363 *
-## Residuals 235 5064.2 21.55
-## ---
-## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
-&#39; &#39; 1
-##
-## Response pctSmokers :
-## Df Sum Sq Mean Sq F value Pr(&gt;F)
-## `Rural/Urban` 1 0.13 0.12904 0.0544 0.8158
-## Residuals 235 557.53 2.37248
-##
-## Response pctFDInsecure :
-## Df Sum Sq Mean Sq F value Pr(&gt;F)
-## `Rural/Urban` 1 226.65 226.646 18.579 2.399e-05 ***
-## Residuals 235 2866.77 12.199
-## ---
-## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
-&#39; &#39; 1
-##
-## Response pctDiabetes :
-## Df Sum Sq Mean Sq F value Pr(&gt;F)
-## `Rural/Urban` 1 123.8 123.830 5.7449 0.01732 *
-## Residuals 235 5065.4 21.555
-## ---
-## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
-&#39; &#39; 1
-##
-## Response pctBachelors :
-## Df Sum Sq Mean Sq F value Pr(&gt;F)
-## `Rural/Urban` 1 453.6 453.55 8.2307 0.004494 **
-## Residuals 235 12949.7 55.11
-## ---
-## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
-&#39; &#39; 1
-##
-## Response medianincome :
-## Df Sum Sq Mean Sq F value Pr(&gt;F)
-## `Rural/Urban` 1 6.7230e+08 672304205 4.6828 0.03147 *
-## Residuals 235 3.3738e+10 143567604
-## ---
-## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
-&#39; &#39; 1
-##
-## Response pctinsufficientsleep :
-## Df Sum Sq Mean Sq F value Pr(&gt;F)
-## `Rural/Urban` 1 79.99 79.990 29.123 1.657e-07 ***
-## Residuals 235 645.46 2.747
-## ---
-## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
-&#39; &#39; 1
-##
-## Response pctexcessdrinking :
-## Df Sum Sq Mean Sq F value Pr(&gt;F)
-## `Rural/Urban` 1 25.80 25.8035 8.1368 0.004724 **
-## Residuals 235 745.24 3.1712
-## ---
-## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
-&#39; &#39; 1</code></pre>
-<pre class="r"><code>project2%&gt;% group_by(`Rural/Urban`)%&gt;% summarize( mean(Lifeexpt), mean(pctObese),mean(pctInactive),mean(pctSmokers), mean(pctFDInsecure), mean(pctDiabetes),mean(pctBachelors),mean(medianincome),mean(pctinsufficientsleep),mean(pctexcessdrinking))</code></pre>
-<pre><code>## # A tibble: 2 x 11
-## `Rural/Urban` `mean(Lifeexpt)` `mean(pctObese)`
-`mean(pctInacti~ `mean(pctSmoker~ `mean(pctFDInse~
-## &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-## 1 Mostly Rural 77.0 31.5 28.2 15.0 15.5
-## 2 Mostly Urban 77.9 31.8 26.8 15.0 13.6
-## # ... with 5 more variables: `mean(pctDiabetes)` &lt;dbl&gt;,
-`mean(pctBachelors)` &lt;dbl&gt;,
-## # `mean(medianincome)` &lt;dbl&gt;,
-`mean(pctinsufficientsleep)` &lt;dbl&gt;,
-`mean(pctexcessdrinking)` &lt;dbl&gt;</code></pre>
-<pre class="r"><code>pairwise.t.test(project2$Lifeexpt,project2$`Rural/Urban`,p.adj=&quot;none&quot;)</code></pre>
-<pre><code>## 
-##  Pairwise comparisons using t tests with pooled SD 
-## 
-## data:  project2$Lifeexpt and project2$`Rural/Urban` 
-## 
-##              Mostly Rural
-## Mostly Urban 0.0079      
-## 
-## P value adjustment method: none</code></pre>
-<pre class="r"><code>pairwise.t.test(project2$pctInactive,project2$`Rural/Urban`,p.adj=&quot;none&quot;)</code></pre>
-<pre><code>## 
-##  Pairwise comparisons using t tests with pooled SD 
-## 
-## data:  project2$pctInactive and project2$`Rural/Urban` 
-## 
-##              Mostly Rural
-## Mostly Urban 0.024       
-## 
-## P value adjustment method: none</code></pre>
-<pre class="r"><code>pairwise.t.test(project2$pctFDInsecure,project2$`Rural/Urban`,p.adj=&quot;none&quot;)</code></pre>
-<pre><code>## 
-##  Pairwise comparisons using t tests with pooled SD 
-## 
-## data:  project2$pctFDInsecure and project2$`Rural/Urban` 
-## 
-##              Mostly Rural
-## Mostly Urban 2.4e-05     
-## 
-## P value adjustment method: none</code></pre>
-<pre class="r"><code>pairwise.t.test(project2$pctDiabetes,project2$`Rural/Urban`,p.adj=&quot;none&quot;)</code></pre>
-<pre><code>## 
-##  Pairwise comparisons using t tests with pooled SD 
-## 
-## data:  project2$pctDiabetes and project2$`Rural/Urban` 
-## 
-##              Mostly Rural
-## Mostly Urban 0.017       
-## 
-## P value adjustment method: none</code></pre>
-<pre class="r"><code>pairwise.t.test(project2$pctBachelors,project2$`Rural/Urban`,p.adj=&quot;none&quot;)</code></pre>
-<pre><code>## 
-##  Pairwise comparisons using t tests with pooled SD 
-## 
-## data:  project2$pctBachelors and project2$`Rural/Urban` 
-## 
-##              Mostly Rural
-## Mostly Urban 0.0045      
-## 
-## P value adjustment method: none</code></pre>
-<pre class="r"><code>pairwise.t.test(project2$medianincome,project2$`Rural/Urban`,p.adj=&quot;none&quot;)</code></pre>
-<pre><code>## 
-##  Pairwise comparisons using t tests with pooled SD 
-## 
-## data:  project2$medianincome and project2$`Rural/Urban` 
-## 
-##              Mostly Rural
-## Mostly Urban 0.031       
-## 
-## P value adjustment method: none</code></pre>
-<pre class="r"><code>pairwise.t.test(project2$pctinsufficientsleep,project2$`Rural/Urban`,p.adj=&quot;none&quot;)</code></pre>
-<pre><code>##
-## Pairwise comparisons using t tests with pooled SD
-##
-## data: project2$pctinsufficientsleep and
-project2$`Rural/Urban`
-##
-## Mostly Rural
-## Mostly Urban 1.7e-07
-##
-## P value adjustment method: none</code></pre>
-<pre class="r"><code>pairwise.t.test(project2$pctexcessdrinking,project2$`Rural/Urban`,p.adj=&quot;none&quot;)</code></pre>
-<pre><code>##
-## Pairwise comparisons using t tests with pooled SD
-##
-## data: project2$pctexcessdrinking and
-project2$`Rural/Urban`
-##
-## Mostly Rural
-## Mostly Urban 0.0047
-##
-## P value adjustment method: none</code></pre>
-<pre class="r"><code>1-.95^28</code></pre>
-<pre><code>## [1] 0.7621731</code></pre>
-<pre class="r"><code>.05/28</code></pre>
-<pre><code>## [1] 0.001785714</code></pre>
-<p>The MANOVA test was performed for all of the variables except pctRural to determine whether there was a mean difference across the Rural/Urban categorical variable. The overall Manova was significant with a Pillai trace of 0.33048 and a p-value of 8.078e-15. Univariate ANOVAS were then performed which showed that life expectancy, percent inactivity, percent food insecure, percent diabetes, percent diabetes, percent bachelors, median income, percent insufficient sleep, and percent excess drinking differed signifiantly between mostly urban and mostly rural counties. Paired t-test were then percformed with the variables that were significant under the univeriate ANOVAS. The probability of at least one type I error if unadjusted would be 76,22%. The signifiance is adjusted to .001785 as the number of tests performed in total is 28. This means that only percent insufficient sleep and percent food insecure remain significantly different between counties. MANOVA assumptions of random samples, liniear relationships, homogeneity and multivariate normality, and no multicollinearity are likely violated. With this type of data these asssumptions are not likely to have been met.</p>
-</div>
-<div id="randomization-test" class="section level1">
-<h1>Randomization Test</h1>
-<pre class="r"><code>project2%&gt;% group_by(`Rural/Urban`)%&gt;% summarize(mean=mean(Lifeexpt))%&gt;% summarize(diff(mean))</code></pre>
-<pre><code>## # A tibble: 1 x 1
-##   `diff(mean)`
-##          &lt;dbl&gt;
-## 1        0.830</code></pre>
-<pre class="r"><code>rand_dist&lt;-vector()
-for(i in 1:5000){
-new&lt;-data.frame(Lifeexp=sample(project2$Lifeexpt), urbanorurual=project2$`Rural/Urban`) 
-rand_dist[i]&lt;-mean(new[new$urbanorurual==&quot;Mostly Urban&quot;,]$Lifeexp)-
-  mean(new[new$urbanorurual==&quot;Mostly Rural&quot;,]$Lifeexp)
+<pre><code>## # A tibble: 6 x 318
+##   FIPS.x State.x County `Years of Poten~ `95% CI - Low..~ `95% CI - High.~
+##   &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;             &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1 48000  Texas   &lt;NA&gt;              6681.            6648.            6715.
+## 2 48001  Texas   Ander~           10273.            9393.           11152.
+## 3 48003  Texas   Andre~            7953.            6517.            9389.
+## 4 48005  Texas   Angel~            9018.            8324.            9713.
+## 5 48007  Texas   Arans~            9316.            7966.           10665.
+## 6 48009  Texas   Archer            9446.            6731.           12161.
+## # ... with 312 more variables: `Z-Score...7` &lt;dbl&gt;, `YPLL Rate (Black)` &lt;dbl&gt;,
+## #   `YPLL Rate (Hispanic)` &lt;dbl&gt;, `YPLL Rate (White)` &lt;dbl&gt;, `%
+## #   Fair/Poor` &lt;dbl&gt;, `95% CI - Low...12.x` &lt;dbl&gt;, `95% CI -
+## #   High...13.x` &lt;dbl&gt;, `Z-Score...14` &lt;dbl&gt;, `Physically Unhealthy
+## #   Days` &lt;dbl&gt;, `95% CI - Low...16` &lt;dbl&gt;, `95% CI - High...17` &lt;dbl&gt;,
+## #   `Z-Score...18` &lt;dbl&gt;, `Mentally Unhealthy Days` &lt;dbl&gt;, `95% CI -
+## #   Low...20` &lt;dbl&gt;, `95% CI - High...21` &lt;dbl&gt;, `Z-Score...22` &lt;dbl&gt;,
+## #   Unreliable &lt;chr&gt;, `% LBW` &lt;dbl&gt;, `95% CI - Low...25` &lt;dbl&gt;, `95% CI -
+## #   High...26` &lt;dbl&gt;, `Z-Score...27` &lt;dbl&gt;, `% LBW (Black)` &lt;dbl&gt;, `% LBW
+## #   (Hispanic)` &lt;dbl&gt;, `% LBW (White)` &lt;dbl&gt;, `% Smokers` &lt;dbl&gt;, `95% CI -
+## #   Low...32.x` &lt;dbl&gt;, `95% CI - High...33.x` &lt;dbl&gt;, `Z-Score...34` &lt;dbl&gt;, `%
+## #   Obese` &lt;dbl&gt;, `95% CI - Low...36` &lt;dbl&gt;, `95% CI - High...37` &lt;dbl&gt;,
+## #   `Z-Score...38` &lt;dbl&gt;, `Food Environment Index` &lt;dbl&gt;, `Z-Score...40` &lt;dbl&gt;,
+## #   `% Physically Inactive` &lt;dbl&gt;, `95% CI - Low...42` &lt;dbl&gt;, `95% CI -
+## #   High...43` &lt;dbl&gt;, `Z-Score...44` &lt;dbl&gt;, `% With Access` &lt;dbl&gt;,
+## #   `Z-Score...46` &lt;dbl&gt;, `% Excessive Drinking` &lt;dbl&gt;, `95% CI -
+## #   Low...48` &lt;dbl&gt;, `95% CI - High...49` &lt;dbl&gt;, `Z-Score...50` &lt;dbl&gt;, `#
+## #   Alcohol-Impaired Driving Deaths` &lt;dbl&gt;, `# Driving Deaths` &lt;dbl&gt;, `%
+## #   Alcohol-Impaired` &lt;dbl&gt;, `95% CI - Low...54` &lt;dbl&gt;, `95% CI -
+## #   High...55` &lt;dbl&gt;, `Z-Score...56` &lt;dbl&gt;, `# Chlamydia Cases` &lt;dbl&gt;,
+## #   `Chlamydia Rate` &lt;dbl&gt;, `Z-Score...59` &lt;dbl&gt;, `Teen Birth Rate` &lt;dbl&gt;, `95%
+## #   CI - Low...61.x` &lt;dbl&gt;, `95% CI - High...62.x` &lt;dbl&gt;, `Z-Score...63` &lt;dbl&gt;,
+## #   `Teen Birth Rate (Black)` &lt;dbl&gt;, `Teen Birth Rate (Hispanic)` &lt;dbl&gt;, `Teen
+## #   Birth Rate (White)` &lt;dbl&gt;, `# Uninsured` &lt;dbl&gt;, `% Uninsured` &lt;dbl&gt;, `95%
+## #   CI - Low...69` &lt;dbl&gt;, `95% CI - High...70` &lt;dbl&gt;, `Z-Score...71` &lt;dbl&gt;, `#
+## #   Primary Care Physicians` &lt;dbl&gt;, `PCP Rate` &lt;dbl&gt;, `PCP Ratio` &lt;chr&gt;,
+## #   `Z-Score...75` &lt;dbl&gt;, `# Dentists` &lt;dbl&gt;, `Dentist Rate` &lt;dbl&gt;, `Dentist
+## #   Ratio` &lt;chr&gt;, `Z-Score...79` &lt;dbl&gt;, `# Mental Health Providers` &lt;dbl&gt;, `MHP
+## #   Rate` &lt;dbl&gt;, `MHP Ratio` &lt;chr&gt;, `Z-Score...83` &lt;dbl&gt;, `Preventable Hosp.
+## #   Rate` &lt;dbl&gt;, `Z-Score...85` &lt;dbl&gt;, `Preventable Hosp. Rate (Black)` &lt;dbl&gt;,
+## #   `Preventable Hosp. Rate (Hispanic)` &lt;dbl&gt;, `Preventable Hosp. Rate
+## #   (White)` &lt;dbl&gt;, `% Screened` &lt;dbl&gt;, `Z-Score...90` &lt;dbl&gt;, `% Screened
+## #   (Black)` &lt;dbl&gt;, `% Screened (Hispanic)` &lt;dbl&gt;, `% Screened (White)` &lt;dbl&gt;,
+## #   `% Vaccinated` &lt;dbl&gt;, `Z-Score...95` &lt;dbl&gt;, `% Vaccinated (Black)` &lt;dbl&gt;,
+## #   `% Vaccinated (Hispanic)` &lt;dbl&gt;, `% Vaccinated (White)` &lt;dbl&gt;, `Cohort
+## #   Size` &lt;dbl&gt;, `Graduation Rate` &lt;dbl&gt;, `Z-Score...101` &lt;dbl&gt;, `# Some
+## #   College` &lt;dbl&gt;, Population.x &lt;dbl&gt;, `% Some College` &lt;dbl&gt;, `95% CI -
+## #   Low...105` &lt;dbl&gt;, `95% CI - High...106` &lt;dbl&gt;, ...</code></pre>
+<pre class="r"><code>project1 &lt;- fulldata %&gt;% select(County, `% Obese`, `% Diabetic`, 
+    `Percent of adults with a bachelor&#39;s degree or higher, 2014-18`, 
+    `Household Income`, `% Rural`)
+
+project1 &lt;- project1 %&gt;% slice(2:255)
+project1 &lt;- project1 %&gt;% rename(PercentObese = `% Obese`) %&gt;% 
+    rename(PercentDiabetic = `% Diabetic`) %&gt;% rename(PercentBachelors = `Percent of adults with a bachelor&#39;s degree or higher, 2014-18`) %&gt;% 
+    rename(Medianincome = `Household Income`) %&gt;% rename(pctRural = `% Rural`)
+glimpse(project1)</code></pre>
+<pre><code>## Rows: 254
+## Columns: 6
+## $ County           &lt;chr&gt; &quot;Anderson&quot;, &quot;Andrews&quot;, &quot;Angelina&quot;, &quot;Aransas&quot;, &quot;Arc...
+## $ PercentObese     &lt;dbl&gt; 34.4, 32.2, 39.8, 31.8, 28.2, 29.4, 33.9, 29.9, 29...
+## $ PercentDiabetic  &lt;dbl&gt; 10.7, 8.6, 13.6, 13.7, 11.3, 11.3, 11.6, 10.3, 9.7...
+## $ PercentBachelors &lt;dbl&gt; 11.7, 10.4, 16.3, 21.7, 23.4, 23.2, 13.3, 23.5, 17...
+## $ Medianincome     &lt;dbl&gt; 42412, 63451, 45318, 46970, 58311, 55337, 48636, 6...
+## $ pctRural         &lt;dbl&gt; 67.063533, 16.502097, 43.082366, 27.260558, 88.988...</code></pre>
+<p>To create the data set that was used for project one a left join was first performed with 2019 County Health Rankings Ranked Measure Data with data from the USDA Economic Research Service about educational attainment, which had already been filtered for TX counties only. This partial dataset was then joined, using a left join, to 2019 County Health Rankings Additional Measured data to in order to get median household income data.The 5 variables that were selected for the project were % Obesse, % Inactive, % Bachelors Degree, Median Household Income, and % Rural. Left Joins were used to keep all columns for both dataframs but only for the counties that matched between each dataframe.</p>
+<pre class="r"><code>project1 %&gt;% arrange(-Medianincome) %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 254
+## Columns: 6
+## $ County           &lt;chr&gt; &quot;Rockwall&quot;, &quot;Collin&quot;, &quot;Fort Bend&quot;, &quot;Kendall&quot;, &quot;Den...
+## $ PercentObese     &lt;dbl&gt; 25.4, 26.9, 29.1, 26.3, 24.3, 31.4, 27.7, 29.9, 28...
+## $ PercentDiabetic  &lt;dbl&gt; 9.6, 8.9, 9.3, 9.3, 8.3, 7.9, 9.5, 10.6, 9.9, 8.7,...
+## $ PercentBachelors &lt;dbl&gt; 40.3, 51.7, 46.1, 40.9, 44.5, 41.1, 21.5, 29.7, 23...
+## $ Medianincome     &lt;dbl&gt; 98442, 95394, 91661, 89637, 86462, 82131, 81018, 8...
+## $ pctRural         &lt;dbl&gt; 16.035845, 5.242727, 5.535768, 58.159234, 6.905831...</code></pre>
+<pre class="r"><code>project1 &lt;- project1 %&gt;% mutate(`Rural/Urban` = if_else(pctRural &gt; 
+    50, &quot;Mostly Rural&quot;, &quot;Mostly Urban&quot;))
+glimpse(project1)</code></pre>
+<pre><code>## Rows: 254
+## Columns: 7
+## $ County           &lt;chr&gt; &quot;Anderson&quot;, &quot;Andrews&quot;, &quot;Angelina&quot;, &quot;Aransas&quot;, &quot;Arc...
+## $ PercentObese     &lt;dbl&gt; 34.4, 32.2, 39.8, 31.8, 28.2, 29.4, 33.9, 29.9, 29...
+## $ PercentDiabetic  &lt;dbl&gt; 10.7, 8.6, 13.6, 13.7, 11.3, 11.3, 11.6, 10.3, 9.7...
+## $ PercentBachelors &lt;dbl&gt; 11.7, 10.4, 16.3, 21.7, 23.4, 23.2, 13.3, 23.5, 17...
+## $ Medianincome     &lt;dbl&gt; 42412, 63451, 45318, 46970, 58311, 55337, 48636, 6...
+## $ pctRural         &lt;dbl&gt; 67.063533, 16.502097, 43.082366, 27.260558, 88.988...
+## $ `Rural/Urban`    &lt;chr&gt; &quot;Mostly Rural&quot;, &quot;Mostly Urban&quot;, &quot;Mostly Urban&quot;, &quot;M...</code></pre>
+<p>Summary Statistics
+Pivot wider and longer are used here to create organized tables of summary statistics. Pivot longer takes the names and values of the summary statistics into two columns called variable and stat. Pivot wider takes the names from variable and the values fro value to create a new column.</p>
+<pre class="r"><code>project1 %&gt;% summarise_at(2:5, funs(mean = mean, sd = sd, var = var, 
+    max = max, min = min))</code></pre>
+<pre><code>## # A tibble: 1 x 20
+##   PercentObese_me~ PercentDiabetic~ PercentBachelor~ Medianincome_me~
+##              &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1             30.1             10.8             18.7           49347.
+## # ... with 16 more variables: PercentObese_sd &lt;dbl&gt;, PercentDiabetic_sd &lt;dbl&gt;,
+## #   PercentBachelors_sd &lt;dbl&gt;, Medianincome_sd &lt;dbl&gt;, PercentObese_var &lt;dbl&gt;,
+## #   PercentDiabetic_var &lt;dbl&gt;, PercentBachelors_var &lt;dbl&gt;,
+## #   Medianincome_var &lt;dbl&gt;, PercentObese_max &lt;dbl&gt;, PercentDiabetic_max &lt;dbl&gt;,
+## #   PercentBachelors_max &lt;dbl&gt;, Medianincome_max &lt;dbl&gt;, PercentObese_min &lt;dbl&gt;,
+## #   PercentDiabetic_min &lt;dbl&gt;, PercentBachelors_min &lt;dbl&gt;,
+## #   Medianincome_min &lt;dbl&gt;</code></pre>
+<pre class="r"><code>project1 %&gt;% summarise_at(2:5, funs(mean = mean, sd = sd, var = var, 
+    max = max, min = min)) %&gt;% pivot_longer(contains(&quot;_&quot;)) %&gt;% 
+    separate(name, sep = &quot;_&quot;, into = c(&quot;variable&quot;, &quot;Stat&quot;)) %&gt;% 
+    pivot_wider(names_from = &quot;variable&quot;, values_from = &quot;value&quot;) %&gt;% 
+    arrange(Stat) %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+Stat
+</th>
+<th style="text-align:right;">
+PercentObese
+</th>
+<th style="text-align:right;">
+PercentDiabetic
+</th>
+<th style="text-align:right;">
+PercentBachelors
+</th>
+<th style="text-align:right;">
+Medianincome
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+max
+</td>
+<td style="text-align:right;">
+39.800000
+</td>
+<td style="text-align:right;">
+15.100000
+</td>
+<td style="text-align:right;">
+51.700000
+</td>
+<td style="text-align:right;">
+98442.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mean
+</td>
+<td style="text-align:right;">
+30.066142
+</td>
+<td style="text-align:right;">
+10.837795
+</td>
+<td style="text-align:right;">
+18.714173
+</td>
+<td style="text-align:right;">
+49346.70
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+min
+</td>
+<td style="text-align:right;">
+21.500000
+</td>
+<td style="text-align:right;">
+7.100000
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+28106.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sd
+</td>
+<td style="text-align:right;">
+2.383050
+</td>
+<td style="text-align:right;">
+1.467402
+</td>
+<td style="text-align:right;">
+7.536459
+</td>
+<td style="text-align:right;">
+11993.75
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:right;">
+5.678928
+</td>
+<td style="text-align:right;">
+2.153269
+</td>
+<td style="text-align:right;">
+56.798217
+</td>
+<td style="text-align:right;">
+143850138.11
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>project1 %&gt;% group_by(`Rural/Urban`) %&gt;% summarise_at(2:5, funs(mean = mean, 
+    sd = sd, var = var, max = max, min = min)) %&gt;% pivot_longer(contains(&quot;_&quot;)) %&gt;% 
+    separate(name, sep = &quot;_&quot;, into = c(&quot;variable&quot;, &quot;Stat&quot;)) %&gt;% 
+    pivot_wider(names_from = &quot;variable&quot;, values_from = &quot;value&quot;) %&gt;% 
+    arrange(Stat) %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+Rural/Urban
+</th>
+<th style="text-align:left;">
+Stat
+</th>
+<th style="text-align:right;">
+PercentObese
+</th>
+<th style="text-align:right;">
+PercentDiabetic
+</th>
+<th style="text-align:right;">
+PercentBachelors
+</th>
+<th style="text-align:right;">
+Medianincome
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Mostly Rural
+</td>
+<td style="text-align:left;">
+max
+</td>
+<td style="text-align:right;">
+38.000000
+</td>
+<td style="text-align:right;">
+15.100000
+</td>
+<td style="text-align:right;">
+40.900000
+</td>
+<td style="text-align:right;">
+8.963700e+04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mostly Urban
+</td>
+<td style="text-align:left;">
+max
+</td>
+<td style="text-align:right;">
+39.800000
+</td>
+<td style="text-align:right;">
+13.800000
+</td>
+<td style="text-align:right;">
+51.700000
+</td>
+<td style="text-align:right;">
+9.844200e+04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mostly Rural
+</td>
+<td style="text-align:left;">
+mean
+</td>
+<td style="text-align:right;">
+29.904412
+</td>
+<td style="text-align:right;">
+11.463235
+</td>
+<td style="text-align:right;">
+17.472059
+</td>
+<td style="text-align:right;">
+4.802908e+04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mostly Urban
+</td>
+<td style="text-align:left;">
+mean
+</td>
+<td style="text-align:right;">
+30.252542
+</td>
+<td style="text-align:right;">
+10.116949
+</td>
+<td style="text-align:right;">
+20.145763
+</td>
+<td style="text-align:right;">
+5.086532e+04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mostly Rural
+</td>
+<td style="text-align:left;">
+min
+</td>
+<td style="text-align:right;">
+26.300000
+</td>
+<td style="text-align:right;">
+8.400000
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+3.298000e+04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mostly Urban
+</td>
+<td style="text-align:left;">
+min
+</td>
+<td style="text-align:right;">
+21.500000
+</td>
+<td style="text-align:right;">
+7.100000
+</td>
+<td style="text-align:right;">
+7.200000
+</td>
+<td style="text-align:right;">
+2.810600e+04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mostly Rural
+</td>
+<td style="text-align:left;">
+sd
+</td>
+<td style="text-align:right;">
+2.152720
+</td>
+<td style="text-align:right;">
+1.197331
+</td>
+<td style="text-align:right;">
+5.595007
+</td>
+<td style="text-align:right;">
+9.905487e+03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mostly Urban
+</td>
+<td style="text-align:left;">
+sd
+</td>
+<td style="text-align:right;">
+2.620586
+</td>
+<td style="text-align:right;">
+1.422427
+</td>
+<td style="text-align:right;">
+9.101626
+</td>
+<td style="text-align:right;">
+1.391053e+04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mostly Rural
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:right;">
+4.634203
+</td>
+<td style="text-align:right;">
+1.433601
+</td>
+<td style="text-align:right;">
+31.304102
+</td>
+<td style="text-align:right;">
+9.811868e+07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mostly Urban
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:right;">
+6.867472
+</td>
+<td style="text-align:right;">
+2.023300
+</td>
+<td style="text-align:right;">
+82.839597
+</td>
+<td style="text-align:right;">
+1.935027e+08
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>project1 %&gt;% select_if(is.numeric) %&gt;% cor() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+PercentObese
+</th>
+<th style="text-align:right;">
+PercentDiabetic
+</th>
+<th style="text-align:right;">
+PercentBachelors
+</th>
+<th style="text-align:right;">
+Medianincome
+</th>
+<th style="text-align:right;">
+pctRural
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+PercentObese
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+0.2598185
+</td>
+<td style="text-align:right;">
+-0.2712604
+</td>
+<td style="text-align:right;">
+-0.1254862
+</td>
+<td style="text-align:right;">
+-0.1337214
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PercentDiabetic
+</td>
+<td style="text-align:right;">
+0.2598185
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+-0.1579260
+</td>
+<td style="text-align:right;">
+-0.3207670
+</td>
+<td style="text-align:right;">
+0.4902064
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PercentBachelors
+</td>
+<td style="text-align:right;">
+-0.2712604
+</td>
+<td style="text-align:right;">
+-0.1579260
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+0.6320141
+</td>
+<td style="text-align:right;">
+-0.2259000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Medianincome
+</td>
+<td style="text-align:right;">
+-0.1254862
+</td>
+<td style="text-align:right;">
+-0.3207670
+</td>
+<td style="text-align:right;">
+0.6320141
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+-0.1925140
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+pctRural
+</td>
+<td style="text-align:right;">
+-0.1337214
+</td>
+<td style="text-align:right;">
+0.4902064
+</td>
+<td style="text-align:right;">
+-0.2259000
+</td>
+<td style="text-align:right;">
+-0.1925140
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>tidycor &lt;- project1 %&gt;% select_if(is.numeric) %&gt;% cor() %&gt;% as.data.frame %&gt;% 
+    rownames_to_column %&gt;% pivot_longer(-1, names_to = &quot;name&quot;, 
+    values_to = &quot;correlation&quot;)
+tidycor %&gt;% ggplot(aes(rowname, name, fill = correlation)) + 
+    geom_tile() + scale_fill_gradient2(low = &quot;red&quot;, high = &quot;blue&quot;) + 
+    geom_text(aes(label = round(correlation, 2)), color = &quot;black&quot;, 
+        size = 4) + theme(axis.text.x = element_text(angle = 90, 
+    hjust = 1)) + coord_fixed() + ggtitle(&quot;Correlation Matrix for TX County Data&quot;)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>This table shows the correlations between each variable within the project 1 dataset. In blue/purple are the positive correlations between variables. The squares in red/pink show negative correlations. Percent Bachelors positively correlates with Median Household income, and negatively correlates with percent rural, percent diabetic, and percent obese. Percent rural positively correlates with percent diabetic, and negatively correlates with median income, percent bachelors, and percent obesity. Percent obese positively correlates with percent diabetic, but negatively correlates with median income, percent rural, and percent bachelors. These correlations helped to guide what visualizations that were chosen.</p>
+<pre class="r"><code>project1 %&gt;% ggplot() + geom_point(aes(x = Medianincome, y = PercentBachelors, 
+    color = `Rural/Urban`, )) + scale_x_continuous() + geom_smooth(method = &quot;lm&quot;, 
+    se = FALSE, aes(x = Medianincome, y = PercentBachelors, color = `Rural/Urban`)) + 
+    ggtitle(&quot;Percent Bachelors vs Median Income in Texas Counties&quot;) + 
+    scale_x_continuous(labels = scales::dollar) + xlab(&quot;Median Household Income&quot;) + 
+    ylab(&quot;% of County with Bachelors Degree&quot;) + scale_y_continuous(breaks = seq(0, 
+    50, 10)) + scale_color_brewer(palette = &quot;Set1&quot;)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" />
+This graph displays a scatterplot of Median Household Incomes of Texas counties with Percent of a county holding a bachelors degree. There is a positive relationship between having a higher percentage of people with a bachelors degree in a county and a higher median income as seen by the trendline. The “Mostly Urban” counties also have a trendline with a more positive slope compared to the “Mostly Rural” Counties. This indicates that the positive relationship between Percent bachelors and Median household income is stronger in Urban Counties than Rural Counties.</p>
+<pre class="r"><code>project1 %&gt;% ggplot() + geom_smooth(method = &quot;lm&quot;, se = FALSE, 
+    aes(x = PercentObese, y = PercentBachelors, color = `Rural/Urban`)) + 
+    geom_point(aes(x = PercentObese, y = PercentBachelors, color = `Rural/Urban`, 
+        size = Medianincome)) + scale_x_continuous() + ggtitle(&quot;Percent Bachelors vs Obesity Rate in Texas Counties&quot;) + 
+    xlab(&quot;Obesity Rate (%)&quot;) + ylab(&quot;% of County with Bachelors Degree&quot;) + 
+    scale_color_brewer(palette = &quot;Paired&quot;)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" />
+This graph shows the relationship between Obesity Rate, % of a county with a bachelors degree, and median household income. There is a clear negative relationship between obesity rate and Percent bachelors degree. As % Bachelors decreases obesity rates increase as seen by the trendlines. The size of the points indicate miedian income as seen through the bigger points having higher educational attainment. There is also a difference btween Rural/Urban counties as Urban counties have a stronger relationship between obeisty and bachelors degree than rural counties as seen throught the differing slopes.</p>
+<pre class="r"><code>project1 %&gt;% ggplot(aes(x = `Rural/Urban`, y = PercentDiabetic, 
+    fill = `Rural/Urban`)) + geom_bar(stat = &quot;summary&quot;, fun.y = &quot;mean&quot;, 
+    width = 0.7) + geom_errorbar(stat = &quot;summary&quot;, width = 0.5) + 
+    theme(legend.position = &quot;none&quot;) + ggtitle(&quot;Mean Diabetic Percentage in Rural vs Urban Counties&quot;) + 
+    scale_fill_brewer(palette = &quot;Set1&quot;)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" />
+This graph shows a clear difference between Mostly Rural and Mostly Urban counties in the rates of diabetes. Urban counties on average have lower rates of Diabetes than Rural counties.</p>
+<pre class="r"><code>clust_dat &lt;- project1 %&gt;% select(2:6)
+sil_width &lt;- vector()
+for (i in 2:10) {
+    pam_fit &lt;- pam(clust_dat, k = i)
+    sil_width[i] &lt;- pam_fit$silinfo$avg.width
 }
-
-
-
-mean(rand_dist&lt; -.8304265        | rand_dist&gt;0.8304265      )</code></pre>
-<pre><code>## [1] 0.0094</code></pre>
-<pre class="r"><code>hist(rand_dist, main = &quot;&quot;, ylab = &quot;&quot;); abline(v=-0.8304265  , col=&quot;red&quot;);abline(v=0.8247375 , col=&quot;red&quot;)</code></pre>
-<p><img src="/project2_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" />
-A randomization test was performed on one of the variables that was significant in the univariate ANOVAS, Life expectancy. The randomization test was performed for the mean differences between the Mostly Urban and Mostly Rural counties. The null hypothesis is that the differences in the means are equal to zero. The alternative hypothesis is that the differences in the means between the two group are not equal to zero. The differences in the mean between the rural and urban counties in the dataset is .84042. The two-tailed p-value is computed by seeing the proportion of the mean differnces under the simulated null hypothesis that are more extreme than the actual value of plus or minus .8304265. Ultimately the computed p-value was .0076, which is well below the necessary p-value of .05. This means that the null hypothesis can be rejected and we can conclude that there is indeed a significant difference in the means between the two groups.</p>
-</div>
-<div id="linear-regression" class="section level1">
-<h1>Linear Regression</h1>
-<pre class="r"><code>project2$pctObese_c&lt;-(project2$pctObese-mean(project2$pctObese))
-project2$pctSmokers_c&lt;-(project2$pctSmokers-mean(project2$pctSmokers))
-project2$pctexcessdrinking_c&lt;-(project2$pctexcessdrinking-mean(project2$pctexcessdrinking))
-project2$pctFDInsecure_c&lt;-(project2$pctFDInsecure-mean(project2$pctFDInsecure))
-fit1&lt;-lm(Lifeexpt~pctObese_c*pctSmokers_c*pctFDInsecure_c*pctexcessdrinking_c ,data=project2)
-summary(fit1)</code></pre>
-<pre><code>##
-## Call:
-## lm(formula = Lifeexpt ~ pctObese_c * pctSmokers_c *
-pctFDInsecure_c *
-## pctexcessdrinking_c, data = project2)
-##
-## Residuals:
-## Min 1Q Median 3Q Max
-## -6.2359 -1.0366 -0.1286 1.0374 10.6818
-##
-## Coefficients:
-## Estimate Std. Error t value Pr(&gt;|t|)
-## (Intercept) 77.194298 0.157557 489.944 &lt; 2e-16
-## pctObese_c -0.069386 0.032830 -2.114 0.035679
-## pctSmokers_c -0.526837 0.119198 -4.420 1.55e-05
-## pctFDInsecure_c -0.117016 0.047041 -2.488 0.013602
-## pctexcessdrinking_c -0.066368 0.098937 -0.671 0.503044
-## pctObese_c:pctSmokers_c 0.040947 0.024289 1.686 0.093239
-## pctObese_c:pctFDInsecure_c -0.003714 0.008888 -0.418
-0.676403
-## pctSmokers_c:pctFDInsecure_c 0.014818 0.031560 0.470
-0.639162
-## pctObese_c:pctexcessdrinking_c -0.010845 0.018142 -0.598
-0.550612
-## pctSmokers_c:pctexcessdrinking_c -0.193368 0.050845
--3.803 0.000185
-## pctFDInsecure_c:pctexcessdrinking_c 0.100632 0.030323
-3.319 0.001058
-## pctObese_c:pctSmokers_c:pctFDInsecure_c 0.003717
-0.005457 0.681 0.496444
-## pctObese_c:pctSmokers_c:pctexcessdrinking_c -0.003599
-0.008180 -0.440 0.660363
-## pctObese_c:pctFDInsecure_c:pctexcessdrinking_c 0.004489
-0.005380 0.834 0.404983
-## pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
--0.002156 0.016035 -0.134 0.893149
-##
-pctObese_c:pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
-0.003756 0.003092 1.215 0.225770
-##
-## (Intercept) ***
-## pctObese_c *
-## pctSmokers_c ***
-## pctFDInsecure_c *
-## pctexcessdrinking_c
-## pctObese_c:pctSmokers_c .
-## pctObese_c:pctFDInsecure_c
-## pctSmokers_c:pctFDInsecure_c
-## pctObese_c:pctexcessdrinking_c
-## pctSmokers_c:pctexcessdrinking_c ***
-## pctFDInsecure_c:pctexcessdrinking_c **
-## pctObese_c:pctSmokers_c:pctFDInsecure_c
-## pctObese_c:pctSmokers_c:pctexcessdrinking_c
-## pctObese_c:pctFDInsecure_c:pctexcessdrinking_c
-## pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
-##
-pctObese_c:pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
-## ---
-## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
-&#39; &#39; 1
-##
-## Residual standard error: 2.004 on 221 degrees of freedom
-## Multiple R-squared: 0.3557, Adjusted R-squared: 0.312
-## F-statistic: 8.135 on 15 and 221 DF, p-value: 1.363e-14</code></pre>
-<pre class="r"><code>ggplot(project2, aes(x=Lifeexpt, y=pctSmokers_c))+geom_point()+
-  geom_smooth(method=&quot;lm&quot;,formula=y~x,se=F,fullrange=T,aes())+ggtitle(&quot;Life Expectancy and the Percentage of Smokers in a TX County&quot;)+xlab(&quot;Life Expectancy&quot;)+ylab(&quot;Percent Smokers Mean Centered &quot;)</code></pre>
-<p><img src="/project2_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>ggplot(project2, aes(x=Lifeexpt, y=pctFDInsecure_c))+geom_point()+
-  geom_smooth(method=&quot;lm&quot;,formula=y~x,se=F,fullrange=T,aes())+ggtitle(&quot;Life Expectancy and the Percentage Food Insecurity in a TX County&quot;)+xlab(&quot;Life Expectancy&quot;)+ylab(&quot;Percent Food Insecure Mean Centered &quot;)</code></pre>
-<p><img src="/project2_files/figure-html/unnamed-chunk-5-2.png" width="768" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>resids&lt;-fit1$residuals
-fitvals&lt;-fit1$fitted.values
-ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, col=&quot;red&quot;)</code></pre>
-<p><img src="/project2_files/figure-html/unnamed-chunk-5-3.png" width="768" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>ggplot()+geom_histogram(aes(resids), bins=20)</code></pre>
-<p><img src="/project2_files/figure-html/unnamed-chunk-5-4.png" width="768" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>ggplot()+geom_qq(aes(sample=resids))+geom_qq_line(aes(sample=resids))</code></pre>
-<p><img src="/project2_files/figure-html/unnamed-chunk-5-5.png" width="768" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>ks.test(resids, &quot;pnorm&quot;, mean=0, sd(resids))</code></pre>
-<pre><code>## 
-##  One-sample Kolmogorov-Smirnov test
+ggplot() + geom_line(aes(x = 1:10, y = sil_width)) + scale_x_continuous(name = &quot;k&quot;, 
+    breaks = 1:10) + ggtitle(&quot;Silhouette Width vs Number of Clusters&quot;)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" />
+This is a graph of silhouette width for the numeric data for project one. This graph shows that 2 clusters would be the optimal number of clusters as it has the highest silhouette width.</p>
+<pre class="r"><code>pamproject1 &lt;- clust_dat %&gt;% pam(k = 2)
+pamproject1</code></pre>
+<pre><code>## Medoids:
+##       ID PercentObese PercentDiabetic PercentBachelors Medianincome pctRural
+## [1,] 177         31.4            11.3             15.5        42662 32.65641
+## [2,] 251         29.1             9.1             16.3        58363 37.32707
+## Clustering vector:
+##   [1] 1 2 1 1 2 2 1 2 1 2 2 1 1 2 2 2 2 1 1 2 1 1 1 1 1 1 2 2 2 1 1 1 2 1 1 2 1
+##  [38] 1 2 1 1 1 2 1 1 2 1 1 2 2 1 2 1 1 1 1 2 1 1 1 2 1 1 1 1 1 1 2 1 2 1 1 1 2
+##  [75] 2 1 1 1 2 1 1 1 2 2 1 2 2 2 1 1 2 1 1 2 1 1 1 2 1 2
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 154 entries ]
+## Objective function:
+##    build     swap 
+## 5917.180 5267.462 
 ## 
-## data:  resids
-## D = 0.086239, p-value = 0.05889
-## alternative hypothesis: two-sided</code></pre>
-<pre class="r"><code>library(sandwich)
-library(lmtest)
-bptest(fit1)</code></pre>
-<pre><code>## 
-##  studentized Breusch-Pagan test
-## 
-## data:  fit1
-## BP = 30.587, df = 15, p-value = 0.009973</code></pre>
-<pre class="r"><code>coeftest(fit1)</code></pre>
-<pre><code>##
-## t test of coefficients:
-##
-## Estimate Std. Error t value
-## (Intercept) 77.1942983 0.1575573 489.9442
-## pctObese_c -0.0693862 0.0328298 -2.1135
-## pctSmokers_c -0.5268371 0.1191981 -4.4198
-## pctFDInsecure_c -0.1170160 0.0470406 -2.4876
-## pctexcessdrinking_c -0.0663677 0.0989371 -0.6708
-## pctObese_c:pctSmokers_c 0.0409474 0.0242891 1.6858
-## pctObese_c:pctFDInsecure_c -0.0037145 0.0088877 -0.4179
-## pctSmokers_c:pctFDInsecure_c 0.0148181 0.0315601 0.4695
-## pctObese_c:pctexcessdrinking_c -0.0108447 0.0181423
--0.5978
-## pctSmokers_c:pctexcessdrinking_c -0.1933683 0.0508446
--3.8031
-## pctFDInsecure_c:pctexcessdrinking_c 0.1006319 0.0303232
-3.3186
-## pctObese_c:pctSmokers_c:pctFDInsecure_c 0.0037175
-0.0054571 0.6812
-## pctObese_c:pctSmokers_c:pctexcessdrinking_c -0.0035992
-0.0081799 -0.4400
-## pctObese_c:pctFDInsecure_c:pctexcessdrinking_c 0.0044887
-0.0053799 0.8344
-## pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
--0.0021564 0.0160354 -0.1345
-##
-pctObese_c:pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
-0.0037561 0.0030921 1.2147
-## Pr(&gt;|t|)
-## (Intercept) &lt; 2.2e-16 ***
-## pctObese_c 0.0356787 *
-## pctSmokers_c 1.548e-05 ***
-## pctFDInsecure_c 0.0136017 *
-## pctexcessdrinking_c 0.5030439
-## pctObese_c:pctSmokers_c 0.0932387 .
-## pctObese_c:pctFDInsecure_c 0.6764028
-## pctSmokers_c:pctFDInsecure_c 0.6391617
-## pctObese_c:pctexcessdrinking_c 0.5506122
-## pctSmokers_c:pctexcessdrinking_c 0.0001849 ***
-## pctFDInsecure_c:pctexcessdrinking_c 0.0010578 **
-## pctObese_c:pctSmokers_c:pctFDInsecure_c 0.4964439
-## pctObese_c:pctSmokers_c:pctexcessdrinking_c 0.6603633
-## pctObese_c:pctFDInsecure_c:pctexcessdrinking_c 0.4049830
-## pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
-0.8931487
-##
-pctObese_c:pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
-0.2257700
-## ---
-## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
-&#39; &#39; 1</code></pre>
-<pre class="r"><code>coeftest(fit1, vcov = vcovHC(fit1)) </code></pre>
-<pre><code>##
-## t test of coefficients:
-##
-## Estimate Std. Error t value
-## (Intercept) 77.1942983 0.1451124 531.9623
-## pctObese_c -0.0693862 0.0295902 -2.3449
-## pctSmokers_c -0.5268371 0.1684786 -3.1270
-## pctFDInsecure_c -0.1170160 0.0494188 -2.3678
-## pctexcessdrinking_c -0.0663677 0.1420910 -0.4671
-## pctObese_c:pctSmokers_c 0.0409474 0.0274748 1.4904
-## pctObese_c:pctFDInsecure_c -0.0037145 0.0101626 -0.3655
-## pctSmokers_c:pctFDInsecure_c 0.0148181 0.0353240 0.4195
-## pctObese_c:pctexcessdrinking_c -0.0108447 0.0239771
--0.4523
-## pctSmokers_c:pctexcessdrinking_c -0.1933683 0.0740946
--2.6098
-## pctFDInsecure_c:pctexcessdrinking_c 0.1006319 0.0411421
-2.4460
-## pctObese_c:pctSmokers_c:pctFDInsecure_c 0.0037175
-0.0063890 0.5819
-## pctObese_c:pctSmokers_c:pctexcessdrinking_c -0.0035992
-0.0129938 -0.2770
-## pctObese_c:pctFDInsecure_c:pctexcessdrinking_c 0.0044887
-0.0085036 0.5279
-## pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
--0.0021564 0.0234224 -0.0921
-##
-pctObese_c:pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
-0.0037561 0.0045277 0.8296
-## Pr(&gt;|t|)
-## (Intercept) &lt; 2.2e-16 ***
-## pctObese_c 0.019918 *
-## pctSmokers_c 0.002003 **
-## pctFDInsecure_c 0.018755 *
-## pctexcessdrinking_c 0.640904
-## pctObese_c:pctSmokers_c 0.137554
-## pctObese_c:pctFDInsecure_c 0.715084
-## pctSmokers_c:pctFDInsecure_c 0.675265
-## pctObese_c:pctexcessdrinking_c 0.651501
-## pctSmokers_c:pctexcessdrinking_c 0.009680 **
-## pctFDInsecure_c:pctexcessdrinking_c 0.015228 *
-## pctObese_c:pctSmokers_c:pctFDInsecure_c 0.561255
-## pctObese_c:pctSmokers_c:pctexcessdrinking_c 0.782042
-## pctObese_c:pctFDInsecure_c:pctexcessdrinking_c 0.598127
-## pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
-0.926730
-##
-pctObese_c:pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
-0.407677
-## ---
-## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
-&#39; &#39; 1</code></pre>
-<p>This model was created by using the variables of percent obesity, percent smokers, percent Food Insecure, and percent excessive drinking as well as their interactions to predict life expectancy. The numeric predictors were first mean centered. The main coefficients for this model are all negative (-.069, -.53, -.12, -.069) which means that with each 1% increase in these variables will result in a -.069, -.53, -.11, -.059 reduction in life expectancy for the county respectively. The interactions of the variables range from both negative to postive effects the two effects that are significant are pctSmokers_c:pctexcessdrinking_c with a slope of-.19 and pctFDInsecure_c:pctexcessdrinking_c with a slope of .10.
-Based on the graphs overall the assumptions of linearity, normality, and homoskedasticity seem to be met, but there are definitely outliers that can be seen in each of the plots. The KS test also shows a p-value of .057, although it is low it means that the null hypothesis cannot be rejected.
-Based on the regression with robust standard errors there was not many major changes other than the standard errors decreasing for some variables. The significance of all of the variables was also reduced under the robust standard erors regression.
-The Multiple R-squared was 0.3559 which means that this linear regression model explains .3559 of the variance in life expectancy among texas counties.</p>
+## Available components:
+##  [1] &quot;medoids&quot;    &quot;id.med&quot;     &quot;clustering&quot; &quot;objective&quot;  &quot;isolation&quot; 
+##  [6] &quot;clusinfo&quot;   &quot;silinfo&quot;    &quot;diss&quot;       &quot;call&quot;       &quot;data&quot;</code></pre>
+<pre class="r"><code>project1 %&gt;% count(`Rural/Urban`)</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   `Rural/Urban`     n
+##   &lt;chr&gt;         &lt;int&gt;
+## 1 Mostly Rural    136
+## 2 Mostly Urban    118</code></pre>
+<pre class="r"><code>pamclust &lt;- clust_dat %&gt;% mutate(cluster = as.factor(pamproject1$clustering))
+confmat &lt;- pamclust %&gt;% mutate(RuralUrban = project1$`Rural/Urban`) %&gt;% 
+    group_by(RuralUrban) %&gt;% count(cluster) %&gt;% pivot_wider(names_from = &quot;cluster&quot;, 
+    values_from = &quot;n&quot;, values_fill = list(n = 0))
+confmat</code></pre>
+<pre><code>## # A tibble: 2 x 3
+## # Groups:   RuralUrban [2]
+##   RuralUrban     `1`   `2`
+##   &lt;chr&gt;        &lt;int&gt; &lt;int&gt;
+## 1 Mostly Rural    93    43
+## 2 Mostly Urban    70    48</code></pre>
+<p>Based on the clustering data it does not seem that the counties are clustering based on their rural/urban distinction. There must be a different factor that accounts for the clustering data seen. The first table shows the counts of Mostly Rural and Mostly Urban Counties.</p>
+<pre class="r"><code>plot(pamproject1)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /><img src="/project1_files/figure-html/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" />
+This graph indicated the average silhouette width is .58 which can be interpreted as a resonable structure has been found among the clusters.</p>
+<pre class="r"><code>project1 %&gt;% mutate(cluster = pamproject1$clustering) %&gt;% rename_all(function(x) sub(&quot;_&quot;, 
+    &quot;.&quot;, x)) %&gt;% select_if(is.numeric) %&gt;% group_by(cluster) %&gt;% 
+    mutate(n = n()) %&gt;% group_by(cluster, n) %&gt;% summarize_all(.funs = list(mean = mean, 
+    median = median, sd = sd), na.rm = T) %&gt;% pivot_longer(contains(&quot;_&quot;)) %&gt;% 
+    separate(name, sep = &quot;_&quot;, into = c(&quot;variable&quot;, &quot;stat&quot;)) %&gt;% 
+    pivot_wider(names_from = &quot;variable&quot;, values_from = &quot;value&quot;) %&gt;% 
+    arrange(stat) %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:right;">
+cluster
+</th>
+<th style="text-align:right;">
+n
+</th>
+<th style="text-align:left;">
+stat
+</th>
+<th style="text-align:right;">
+PercentObese
+</th>
+<th style="text-align:right;">
+PercentDiabetic
+</th>
+<th style="text-align:right;">
+PercentBachelors
+</th>
+<th style="text-align:right;">
+Medianincome
+</th>
+<th style="text-align:right;">
+pctRural
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+163
+</td>
+<td style="text-align:left;">
+mean
+</td>
+<td style="text-align:right;">
+30.177914
+</td>
+<td style="text-align:right;">
+11.149693
+</td>
+<td style="text-align:right;">
+16.400000
+</td>
+<td style="text-align:right;">
+42404.810
+</td>
+<td style="text-align:right;">
+58.78728
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:left;">
+mean
+</td>
+<td style="text-align:right;">
+29.865934
+</td>
+<td style="text-align:right;">
+10.279121
+</td>
+<td style="text-align:right;">
+22.859341
+</td>
+<td style="text-align:right;">
+61781.088
+</td>
+<td style="text-align:right;">
+49.66828
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+163
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:right;">
+29.700000
+</td>
+<td style="text-align:right;">
+11.200000
+</td>
+<td style="text-align:right;">
+16.100000
+</td>
+<td style="text-align:right;">
+42650.000
+</td>
+<td style="text-align:right;">
+59.62572
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:right;">
+29.500000
+</td>
+<td style="text-align:right;">
+10.300000
+</td>
+<td style="text-align:right;">
+20.500000
+</td>
+<td style="text-align:right;">
+58363.000
+</td>
+<td style="text-align:right;">
+45.72031
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+163
+</td>
+<td style="text-align:left;">
+sd
+</td>
+<td style="text-align:right;">
+2.281245
+</td>
+<td style="text-align:right;">
+1.486871
+</td>
+<td style="text-align:right;">
+5.163954
+</td>
+<td style="text-align:right;">
+4995.741
+</td>
+<td style="text-align:right;">
+30.62114
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:left;">
+sd
+</td>
+<td style="text-align:right;">
+2.556092
+</td>
+<td style="text-align:right;">
+1.257733
+</td>
+<td style="text-align:right;">
+9.197499
+</td>
+<td style="text-align:right;">
+10763.190
+</td>
+<td style="text-align:right;">
+33.45865
+</td>
+</tr>
+</tbody>
+</table>
+<p>The table above displays summary statistics for each cluster.</p>
+<pre class="r"><code>clust_dat %&gt;% mutate(cluster = as.factor(pamproject1$clustering)) %&gt;% 
+    ggpairs(columns = 1:5, aes(color = cluster))</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" />
+This GGpairs plot shows the two different clusters as red and blue. From this visualization median income is the main differentiating factor between the two clusters.</p>
+<pre class="r"><code>pamclust &lt;- clust_dat %&gt;% mutate(cluster = as.factor(pamproject1$clustering))
+pamclust %&gt;% mutate(`Rural/Urban` = project1$`Rural/Urban`) %&gt;% 
+    ggplot(aes(PercentObese, PercentBachelors, color = `Rural/Urban`, 
+        shape = cluster)) + geom_point() + scale_color_brewer(palette = &quot;Set1&quot;) + 
+    ggtitle(&quot;Percent Bachelors vs Obesity with Cluster Data&quot;) + 
+    ylab(&quot;% of County with Bachelors Degree&quot;) + xlab(&quot;Obesity Rate (%)&quot;)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" />
+This visualization does not show any clear distinction between clusters. This means that the clusters are more likely based on variable(s) that are not % Bachelors, % Obese, or Rural/Urban.</p>
+<pre class="r"><code>pamclust %&gt;% mutate(`Rural/Urban` = project1$`Rural/Urban`) %&gt;% 
+    ggplot(aes(PercentBachelors, Medianincome, color = `Rural/Urban`, 
+        shape = cluster)) + geom_point() + scale_color_brewer(palette = &quot;Set1&quot;) + 
+    ggtitle(&quot;Percent Bachelors vs Median Income with Cluster Data&quot;) + 
+    scale_y_continuous(breaks = seq(20000, 1e+05, 10000), labels = scales::dollar) + 
+    geom_abline(slope = 1, intercept = 50000) + xlab(&quot;% of County with Bachelors Degree&quot;) + 
+    ylab(&quot;Median Household Income&quot;)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>This second visualization captures the distinction between the clusters. The clusters seem to be determined by Median Household Income with the cutoff between clusters occuring around $50,000. Median Income seems to be the main differentiating factor between these two clusters.</p>
 </div>
-<div id="linear-regression-with-boostrapped-standard-errors" class="section level1">
-<h1>Linear Regression with boostrapped Standard errors</h1>
-<pre class="r"><code>samp_distn&lt;-replicate(5000, {
-  boot_dat&lt;- sample_frac(project2, replace=T )
-fit &lt;- lm(Lifeexpt~pctObese_c*pctSmokers_c*pctFDInsecure_c*pctexcessdrinking_c ,data=boot_dat) 
-coef(fit)
-})
-samp_distn%&gt;% t%&gt;% as.data.frame%&gt;% summarize_all(sd)</code></pre>
-<pre><code>## (Intercept) pctObese_c pctSmokers_c pctFDInsecure_c
-pctexcessdrinking_c pctObese_c:pctSmokers_c
-## 1 0.1374589 0.02839079 0.1523727 0.04457916 0.1346517
-0.02499115
-## pctObese_c:pctFDInsecure_c pctSmokers_c:pctFDInsecure_c
-pctObese_c:pctexcessdrinking_c
-## 1 0.008901915 0.03274048 0.0220476
-## pctSmokers_c:pctexcessdrinking_c
-pctFDInsecure_c:pctexcessdrinking_c
-## 1 0.0728172 0.03696841
-## pctObese_c:pctSmokers_c:pctFDInsecure_c
-pctObese_c:pctSmokers_c:pctexcessdrinking_c
-## 1 0.005794588 0.01170797
-## pctObese_c:pctFDInsecure_c:pctexcessdrinking_c
-pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
-## 1 0.007866544 0.02157158
-##
-pctObese_c:pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
-## 1 0.004222526</code></pre>
-<p>The SE in the bootstrapped model has standard errors that are smaller than both the original and robust standard errors that were calculated previously.</p>
+
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 </div>
-<div id="logistic-regression" class="section level1">
-<h1>Logistic Regression</h1>
-<pre class="r"><code>library(lmtest)
-project2%&gt;% mutate(y=ifelse(`Rural/Urban`==&quot;Mostly Urban&quot;,1,0))-&gt;project2
-fit2&lt;-glm(y~Lifeexpt+pctinsufficientsleep, data=project2, family = &quot;binomial&quot;)
-coeftest(fit2)</code></pre>
-<pre><code>##
-## z test of coefficients:
-##
-## Estimate Std. Error z value Pr(&gt;|z|)
-## (Intercept) -30.783976 6.413672 -4.7997 1.589e-06 ***
-## Lifeexpt 0.205676 0.066124 3.1104 0.001868 **
-## pctinsufficientsleep 0.466162 0.091088 5.1177 3.093e-07
-***
-## ---
-## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
-&#39; &#39; 1</code></pre>
-<pre class="r"><code>coef(fit2)%&gt;% exp()%&gt;% data.frame()</code></pre>
-<pre><code>##                                 .
-## (Intercept)          4.272568e-14
-## Lifeexpt             1.228355e+00
-## pctinsufficientsleep 1.593865e+00</code></pre>
-<pre class="r"><code>probs&lt;-predict(fit2, type = &quot;response&quot;)
-table(predict=as.numeric(probs&gt;.5), truth=project2$y)%&gt;%addmargins</code></pre>
-<pre><code>##        truth
-## predict   0   1 Sum
-##     0    82  44 126
-##     1    37  74 111
-##     Sum 119 118 237</code></pre>
-<pre class="r"><code>74/118#TPR Sensitivity</code></pre>
-<pre><code>## [1] 0.6271186</code></pre>
-<pre class="r"><code>81/118#TNR Specificity</code></pre>
-<pre><code>## [1] 0.6864407</code></pre>
-<pre class="r"><code>74/111#Precision PPV</code></pre>
-<pre><code>## [1] 0.6666667</code></pre>
-<pre class="r"><code>project2$logit&lt;-predict(fit2) #get predicted log-odds
-ggplot(project2,aes(logit, fill=`Rural/Urban`))+geom_density(alpha=.3)+
-  geom_vline(xintercept=0,lty=2)</code></pre>
-<p><img src="/project2_files/figure-html/unnamed-chunk-7-1.png" width="768" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>library(plotROC)
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/js/docs.min.js"></script>
+<script src="/js/main.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>
+s="r"><code>library(plotROC)
 ROCplot&lt;-ggplot(project2)+geom_roc(aes(d=y, m=probs), n.cuts=0)
 ROCplot</code></pre>
 <p><img src="/project2_files/figure-html/unnamed-chunk-7-2.png" width="768" style="display: block; margin: auto;" /></p>
