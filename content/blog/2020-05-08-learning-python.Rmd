@@ -7,12 +7,10 @@ categories: []
 tags: []
 description: ''
 ---
-It is possible to do most if not all the things that we did this semester in Rstudio in python. Below I will show functions that were done in my projects and try to recreate them in python. 
+Both R and Python are very useful languages and both have their pros and cons. What is great about python is that many if not all of the statistical techniques learned this semester in R can be replicated in python. 
 ```{r setup, include=FALSE}
 knitr::knit_engines$set(python= reticulate::eng_python)
 library(reticulate)
-py_install("matplotlib")
-
 use_python("C:\\Users\\nkcol\\AppData\\Local\\r-miniconda\\envs\\r-reticulate\\python.exe")
 ```
 
@@ -38,11 +36,10 @@ left_join(partialdata, AdditionalMeasureData, by="County")->fulldata
 fulldata%>%select(County,`Life Expectancy`,`% Adults with Obesity`,`% Physically Inactive`,`% Smokers`,`% Food Insecure`,`% Uninsured`,`% Adults with Diabetes`,`Percent of adults with a bachelor's degree or higher, 2014-18` , `Median Household Income`, `% Insufficient Sleep`,`% Excessive Drinking`,`% Rural`)->project2
 project2%>% na.omit()->project2
 project2%>% rename(Lifeexpt=`Life Expectancy`)%>% rename(pctObese=`% Adults with Obesity`)%>% rename(pctInactive=`% Physically Inactive`)%>% rename(pctFDInsecure=`% Food Insecure`)%>% rename(pctSmokers=`% Smokers`)%>% rename(pctUninsured=`% Uninsured`)%>% rename(pctDiabetes=`% Adults with Diabetes`)%>% rename(pctBachelors=`Percent of adults with a bachelor's degree or higher, 2014-18`)%>% rename(medianincome=`Median Household Income`)%>% rename(pctinsufficientsleep=`% Insufficient Sleep`)%>% rename(pctRural=`% Rural`)%>% rename(pctexcessdrinking=`% Excessive Drinking`)->project2
-project2%>% mutate(RurualorUrban=if_else(pctRural>50, "Mostly Rural", "Mostly Urban"))->project2
-
+project2%>% mutate(RuralorUrban=if_else(pctRural>50, "Mostly Rural", "Mostly Urban"))->project2
 
 ```
-This is the data that was used in project two. I performed a linear regression an example to show how python and rstudio can both be used to perform statistical analysis. 
+This is the data that was used in project 2. I performed a linear regression in both R and in python. 
 
 ```{r}
 fit1<-lm(Lifeexpt~pctObese ,data=project2)
@@ -60,5 +57,9 @@ fit.summary()
 This code shows linear regression of Life expectancy to percent Obesity in Texas counties. The linear regression was performed in both R and in python showing just one of the many similar ways R and python can be used. They both showed a significant negative relationship between obesity and life expectancy. Showing that each percentage increase of obesity results in a decrease of -.131 years. 
 ```{python}
 import matplotlib.pyplot as plt
+import seaborn as sns
+project2=r.project2
 sns.boxplot(x="RuralorUrban", y="pctDiabetes", data=project2)
 ```
+This shows a boxplot that was created using seaborn package in python.It shows the differences between percentage of a county's population with Diabetes and if the county is catagorized as mostly urban or mostly rural.Python has a wide variety of uses and can visualize data just like R can. 
+![](/blog/2020-05-08-learning-python_files/UT.JPG)
