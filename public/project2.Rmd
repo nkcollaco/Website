@@ -1,13 +1,16 @@
 ---
-title: 'Project 2'
-author: 'Noah Collaco'
-
-slug: new-post
-categories: []
-tags: []
+title: "Project 2: Modeling, Testing, and Classification "
+author: 'Noah Collaco '
+date: '2020-05-01'
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
 description: ''
+slug: 
+tags: []
+categories: []
 ---
-
 ```{r setup, include=FALSE}
 library(knitr)
 hook_output = knit_hooks$get('output')

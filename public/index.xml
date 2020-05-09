@@ -6,7 +6,7 @@
     <description>Recent content on Portfolio</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Fri, 13 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 01 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
@@ -22,11 +22,20 @@ library(tidyverse)## -- Attaching packages ------------------------------------
     </item>
     
     <item>
-      <title>Project 1</title>
-      <link>/new-post/</link>
+      <title>Project 2: Modeling, Testing, and Classification </title>
+      <link>/project2/</link>
+      <pubDate>Fri, 01 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/project2/</guid>
+      <description>class_diag &amp;lt;- function(probs,truth){#CONFUSION MATRIX: CALCULATE ACCURACY, TPR, TNR, PPVtab&amp;lt;-table(factor(probs&amp;gt;.5,levels=c(&amp;quot;FALSE&amp;quot;,&amp;quot;TRUE&amp;quot;)),truth)acc=sum(diag(tab))/sum(tab)sens=tab[2,2]/colSums(tab)[2]spec=tab[1,1]/colSums(tab)[1]ppv=tab[2,2]/rowSums(tab)[2]if(is.numeric(truth)==FALSE &amp;amp; is.logical(truth)==FALSE) truth&amp;lt;-as.numeric(truth)-1#CALCULATE EXACT AUCord&amp;lt;-order(probs, decreasing=TRUE)probs &amp;lt;- probs[ord]; truth &amp;lt;- truth[ord]TPR=cumsum(truth)/max(1,sum(truth)) FPR=cumsum(!truth)/max(1,sum(!truth))dup&amp;lt;-c(probs[-1]&amp;gt;=probs[-length(probs)], FALSE)TPR&amp;lt;-c(0,TPR[!dup],1); FPR&amp;lt;-c(0,FPR[!dup],1)n &amp;lt;- length(TPR)auc&amp;lt;- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )data.frame(acc,sens,spec,ppv,auc)}library(readxl)RankedMeasuredData &amp;lt;- read_excel(&amp;quot;2020 County Health Rankings Data - v1.xlsx&amp;quot;, sheet = &amp;quot;Ranked Measure Data&amp;quot;)AdditionalMeasureData &amp;lt;- read_excel(&amp;quot;2020 County Health Rankings Data - v1.</description>
+    </item>
+    
+    <item>
+      <title>Project 1: Exploratory Data Analysis with Tidyverse Tools </title>
+      <link>/project1/</link>
       <pubDate>Fri, 13 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>/new-post/</guid>
+      <guid>/project1/</guid>
       <description>library(tidyverse)library(readxl)library(kableExtra)library(GGally)library(cluster)Education &amp;lt;- read_excel(&amp;quot;Education2.xls&amp;quot;, skip = 4)RankedMeasureData &amp;lt;- read_excel(&amp;quot;2019 County Health Rankings Texas Data - v1_0.xls&amp;quot;, sheet = &amp;quot;Ranked Measure Data&amp;quot;)AdditionalMeasureData &amp;lt;- read_excel(&amp;quot;2019 County Health Rankings Texas Data - v1_0.xls&amp;quot;, sheet = &amp;quot;Additional Measure Data&amp;quot;)This project uses data from the 2019 County Health Rankings for Texas and the USDA ERS Educational Attainment Data. These datasets are large so specific variables of County Name, % Obese, % Diabetic, Percent of a County with a Bachelors Degree, Median Household Income, and % Rural of a County were taken.</description>
     </item>
     
@@ -40,15 +49,6 @@ library(tidyverse)## -- Attaching packages ------------------------------------
   Exploratory Data Analysis with Tidyverse Tools
   Modeling, Testing, and Classification
   </description>
-    </item>
-    
-    <item>
-      <title>Project 2</title>
-      <link>/new-post/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/new-post/</guid>
-      <description>class_diag &amp;lt;- function(probs,truth){#CONFUSION MATRIX: CALCULATE ACCURACY, TPR, TNR, PPVtab&amp;lt;-table(factor(probs&amp;gt;.5,levels=c(&amp;quot;FALSE&amp;quot;,&amp;quot;TRUE&amp;quot;)),truth)acc=sum(diag(tab))/sum(tab)sens=tab[2,2]/colSums(tab)[2]spec=tab[1,1]/colSums(tab)[1]ppv=tab[2,2]/rowSums(tab)[2]if(is.numeric(truth)==FALSE &amp;amp; is.logical(truth)==FALSE) truth&amp;lt;-as.numeric(truth)-1#CALCULATE EXACT AUCord&amp;lt;-order(probs, decreasing=TRUE)probs &amp;lt;- probs[ord]; truth &amp;lt;- truth[ord]TPR=cumsum(truth)/max(1,sum(truth)) FPR=cumsum(!truth)/max(1,sum(!truth))dup&amp;lt;-c(probs[-1]&amp;gt;=probs[-length(probs)], FALSE)TPR&amp;lt;-c(0,TPR[!dup],1); FPR&amp;lt;-c(0,FPR[!dup],1)n &amp;lt;- length(TPR)auc&amp;lt;- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )data.frame(acc,sens,spec,ppv,auc)}library(readxl)RankedMeasuredData &amp;lt;- read_excel(&amp;quot;2020 County Health Rankings Data - v1.xlsx&amp;quot;, sheet = &amp;quot;Ranked Measure Data&amp;quot;)AdditionalMeasureData &amp;lt;- read_excel(&amp;quot;2020 County Health Rankings Data - v1.</description>
     </item>
     
   </channel>

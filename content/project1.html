@@ -1,11 +1,15 @@
 ---
-title: 'Project 1'
-author: 'Noah Collaco'
+title: "Project 1: Exploratory Data Analysis with Tidyverse Tools "
+author: 'Noah Collaco '
 date: '2020-03-13'
-slug: new-post
-categories: []
-tags: []
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
 description: ''
+slug: 
+tags: []
+categories: []
 ---
 
 
@@ -605,7 +609,7 @@ tidycor %&gt;% ggplot(aes(rowname, name, fill = correlation)) +
     geom_text(aes(label = round(correlation, 2)), color = &quot;black&quot;, 
         size = 4) + theme(axis.text.x = element_text(angle = 90, 
     hjust = 1)) + coord_fixed() + ggtitle(&quot;Correlation Matrix for TX County Data&quot;)</code></pre>
-<p><img src="/project1_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>This table shows the correlations between each variable within the project 1 dataset. In blue/purple are the positive correlations between variables. The squares in red/pink show negative correlations. Percent Bachelors positively correlates with Median Household income, and negatively correlates with percent rural, percent diabetic, and percent obese. Percent rural positively correlates with percent diabetic, and negatively correlates with median income, percent bachelors, and percent obesity. Percent obese positively correlates with percent diabetic, but negatively correlates with median income, percent rural, and percent bachelors. These correlations helped to guide what visualizations that were chosen.</p>
 <pre class="r"><code>project1 %&gt;% ggplot() + geom_point(aes(x = Medianincome, y = PercentBachelors, 
     color = `Rural/Urban`, )) + scale_x_continuous() + geom_smooth(method = &quot;lm&quot;, 
@@ -614,7 +618,7 @@ tidycor %&gt;% ggplot(aes(rowname, name, fill = correlation)) +
     scale_x_continuous(labels = scales::dollar) + xlab(&quot;Median Household Income&quot;) + 
     ylab(&quot;% of County with Bachelors Degree&quot;) + scale_y_continuous(breaks = seq(0, 
     50, 10)) + scale_color_brewer(palette = &quot;Set1&quot;)</code></pre>
-<p><img src="/project1_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" />
+<p><img src="/Project1_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" />
 This graph displays a scatterplot of Median Household Incomes of Texas counties with Percent of a county holding a bachelors degree. There is a positive relationship between having a higher percentage of people with a bachelors degree in a county and a higher median income as seen by the trendline. The “Mostly Urban” counties also have a trendline with a more positive slope compared to the “Mostly Rural” Counties. This indicates that the positive relationship between Percent bachelors and Median household income is stronger in Urban Counties than Rural Counties.</p>
 <pre class="r"><code>project1 %&gt;% ggplot() + geom_smooth(method = &quot;lm&quot;, se = FALSE, 
     aes(x = PercentObese, y = PercentBachelors, color = `Rural/Urban`)) + 
@@ -622,14 +626,14 @@ This graph displays a scatterplot of Median Household Incomes of Texas counties 
         size = Medianincome)) + scale_x_continuous() + ggtitle(&quot;Percent Bachelors vs Obesity Rate in Texas Counties&quot;) + 
     xlab(&quot;Obesity Rate (%)&quot;) + ylab(&quot;% of County with Bachelors Degree&quot;) + 
     scale_color_brewer(palette = &quot;Paired&quot;)</code></pre>
-<p><img src="/project1_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" />
+<p><img src="/Project1_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" />
 This graph shows the relationship between Obesity Rate, % of a county with a bachelors degree, and median household income. There is a clear negative relationship between obesity rate and Percent bachelors degree. As % Bachelors decreases obesity rates increase as seen by the trendlines. The size of the points indicate miedian income as seen through the bigger points having higher educational attainment. There is also a difference btween Rural/Urban counties as Urban counties have a stronger relationship between obeisty and bachelors degree than rural counties as seen throught the differing slopes.</p>
 <pre class="r"><code>project1 %&gt;% ggplot(aes(x = `Rural/Urban`, y = PercentDiabetic, 
     fill = `Rural/Urban`)) + geom_bar(stat = &quot;summary&quot;, fun.y = &quot;mean&quot;, 
     width = 0.7) + geom_errorbar(stat = &quot;summary&quot;, width = 0.5) + 
     theme(legend.position = &quot;none&quot;) + ggtitle(&quot;Mean Diabetic Percentage in Rural vs Urban Counties&quot;) + 
     scale_fill_brewer(palette = &quot;Set1&quot;)</code></pre>
-<p><img src="/project1_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" />
+<p><img src="/Project1_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" />
 This graph shows a clear difference between Mostly Rural and Mostly Urban counties in the rates of diabetes. Urban counties on average have lower rates of Diabetes than Rural counties.</p>
 <pre class="r"><code>clust_dat &lt;- project1 %&gt;% select(2:6)
 sil_width &lt;- vector()
@@ -639,7 +643,7 @@ for (i in 2:10) {
 }
 ggplot() + geom_line(aes(x = 1:10, y = sil_width)) + scale_x_continuous(name = &quot;k&quot;, 
     breaks = 1:10) + ggtitle(&quot;Silhouette Width vs Number of Clusters&quot;)</code></pre>
-<p><img src="/project1_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" />
+<p><img src="/Project1_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" />
 This is a graph of silhouette width for the numeric data for project one. This graph shows that 2 clusters would be the optimal number of clusters as it has the highest silhouette width.</p>
 <pre class="r"><code>pamproject1 &lt;- clust_dat %&gt;% pam(k = 2)
 pamproject1</code></pre>
@@ -678,7 +682,7 @@ confmat</code></pre>
 ## 2 Mostly Urban    70    48</code></pre>
 <p>Based on the clustering data it does not seem that the counties are clustering based on their rural/urban distinction. There must be a different factor that accounts for the clustering data seen. The first table shows the counts of Mostly Rural and Mostly Urban Counties.</p>
 <pre class="r"><code>plot(pamproject1)</code></pre>
-<p><img src="/project1_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /><img src="/project1_files/figure-html/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" />
+<p><img src="/Project1_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /><img src="/Project1_files/figure-html/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" />
 This graph indicated the average silhouette width is .58 which can be interpreted as a resonable structure has been found among the clusters.</p>
 <pre class="r"><code>project1 %&gt;% mutate(cluster = pamproject1$clustering) %&gt;% rename_all(function(x) sub(&quot;_&quot;, 
     &quot;.&quot;, x)) %&gt;% select_if(is.numeric) %&gt;% group_by(cluster) %&gt;% 
@@ -878,7 +882,7 @@ sd
 <p>The table above displays summary statistics for each cluster.</p>
 <pre class="r"><code>clust_dat %&gt;% mutate(cluster = as.factor(pamproject1$clustering)) %&gt;% 
     ggpairs(columns = 1:5, aes(color = cluster))</code></pre>
-<p><img src="/project1_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" />
+<p><img src="/Project1_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" />
 This GGpairs plot shows the two different clusters as red and blue. From this visualization median income is the main differentiating factor between the two clusters.</p>
 <pre class="r"><code>pamclust &lt;- clust_dat %&gt;% mutate(cluster = as.factor(pamproject1$clustering))
 pamclust %&gt;% mutate(`Rural/Urban` = project1$`Rural/Urban`) %&gt;% 
@@ -886,7 +890,7 @@ pamclust %&gt;% mutate(`Rural/Urban` = project1$`Rural/Urban`) %&gt;%
         shape = cluster)) + geom_point() + scale_color_brewer(palette = &quot;Set1&quot;) + 
     ggtitle(&quot;Percent Bachelors vs Obesity with Cluster Data&quot;) + 
     ylab(&quot;% of County with Bachelors Degree&quot;) + xlab(&quot;Obesity Rate (%)&quot;)</code></pre>
-<p><img src="/project1_files/figure-html/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" />
+<p><img src="/Project1_files/figure-html/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" />
 This visualization does not show any clear distinction between clusters. This means that the clusters are more likely based on variable(s) that are not % Bachelors, % Obese, or Rural/Urban.</p>
 <pre class="r"><code>pamclust %&gt;% mutate(`Rural/Urban` = project1$`Rural/Urban`) %&gt;% 
     ggplot(aes(PercentBachelors, Medianincome, color = `Rural/Urban`, 
@@ -895,5 +899,5 @@ This visualization does not show any clear distinction between clusters. This me
     scale_y_continuous(breaks = seq(20000, 1e+05, 10000), labels = scales::dollar) + 
     geom_abline(slope = 1, intercept = 50000) + xlab(&quot;% of County with Bachelors Degree&quot;) + 
     ylab(&quot;Median Household Income&quot;)</code></pre>
-<p><img src="/project1_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>This second visualization captures the distinction between the clusters. The clusters seem to be determined by Median Household Income with the cutoff between clusters occuring around $50,000. Median Income seems to be the main differentiating factor between these two clusters.</p>

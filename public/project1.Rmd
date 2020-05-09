@@ -1,11 +1,15 @@
 ---
-title: 'Project 1'
-author: 'Noah Collaco'
+title: "Project 1: Exploratory Data Analysis with Tidyverse Tools "
+author: 'Noah Collaco '
 date: '2020-03-13'
-slug: new-post
-categories: []
-tags: []
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
 description: ''
+slug: 
+tags: []
+categories: []
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = F, message = F,
