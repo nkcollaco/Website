@@ -1,7 +1,7 @@
 ---
 title: 'Project 2'
 author: 'Noah Collaco'
-date: "2020-05-06"
+
 slug: new-post
 categories: []
 tags: []
@@ -10,8 +10,6 @@ description: ''
 
 
 
-<div id="noah-collaco-nkc383" class="section level1">
-<h1>Noah Collaco nkc383</h1>
 <pre class="r"><code>class_diag &lt;- function(probs,truth){
   
   #CONFUSION MATRIX: CALCULATE ACCURACY, TPR, TNR, PPV
@@ -168,7 +166,6 @@ glimpse(project2)</code></pre>
 ## $ `Rural/Urban` &lt;chr&gt; &quot;Mostly Rural&quot;, &quot;Mostly Urban&quot;,
 &quot;Mostly Urban&quot;, &quot;Mostly Urban&quot;, &quot;M...</code></pre>
 <p>This project uses data from the 2019 County Health Rankings for Texas and the USDA ERS Educational Attainment Data.. Each of the data sources were filtered for Texas counties. I wanted to compared how different variables affected Life Expectancy within a county. The variables that were chosen were Obesity Rate, Inactivty Rate, Smoking Rate, Food Insecurity Rate, percent Uninsured, Diabetes Rate, Percent of a county with a bachelors degree, Food Environemnt Index, Percen Insufficient Sleep, percent Excessive drinking, and Percent Rural. The dataset was then filtered to get rid of NAs as there were some counties without measurements for Life Expectancy. This brought down the number of observations from 254 counties to 237 counties.The percent Rural variable was also mutated to be a categorical variable of Mostly Rural and Mostly Urban.</p>
-</div>
 <div id="manova" class="section level1">
 <h1>Manova</h1>
 <pre class="r"><code>man1&lt;-manova(cbind(Lifeexpt, pctObese, pctInactive, pctSmokers, pctFDInsecure, pctDiabetes,pctBachelors,medianincome,pctinsufficientsleep,pctexcessdrinking )~`Rural/Urban`, data=project2)
@@ -370,7 +367,7 @@ rand_dist[i]&lt;-mean(new[new$urbanorurual==&quot;Mostly Urban&quot;,]$Lifeexp)-
 
 
 mean(rand_dist&lt; -.8304265        | rand_dist&gt;0.8304265      )</code></pre>
-<pre><code>## [1] 0.0094</code></pre>
+<pre><code>## [1] 0.0052</code></pre>
 <pre class="r"><code>hist(rand_dist, main = &quot;&quot;, ylab = &quot;&quot;); abline(v=-0.8304265  , col=&quot;red&quot;);abline(v=0.8247375 , col=&quot;red&quot;)</code></pre>
 <p><img src="/project2_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" />
 A randomization test was performed on one of the variables that was significant in the univariate ANOVAS, Life expectancy. The randomization test was performed for the mean differences between the Mostly Urban and Mostly Rural counties. The null hypothesis is that the differences in the means are equal to zero. The alternative hypothesis is that the differences in the means between the two group are not equal to zero. The differences in the mean between the rural and urban counties in the dataset is .84042. The two-tailed p-value is computed by seeing the proportion of the mean differnces under the simulated null hypothesis that are more extreme than the actual value of plus or minus .8304265. Ultimately the computed p-value was .0076, which is well below the necessary p-value of .05. This means that the null hypothesis can be rejected and we can conclude that there is indeed a significant difference in the means between the two groups.</p>
@@ -597,23 +594,23 @@ coef(fit)
 samp_distn%&gt;% t%&gt;% as.data.frame%&gt;% summarize_all(sd)</code></pre>
 <pre><code>## (Intercept) pctObese_c pctSmokers_c pctFDInsecure_c
 pctexcessdrinking_c pctObese_c:pctSmokers_c
-## 1 0.1374589 0.02839079 0.1523727 0.04457916 0.1346517
-0.02499115
+## 1 0.1392767 0.02867634 0.1525738 0.04545518 0.1369758
+0.02471117
 ## pctObese_c:pctFDInsecure_c pctSmokers_c:pctFDInsecure_c
 pctObese_c:pctexcessdrinking_c
-## 1 0.008901915 0.03274048 0.0220476
+## 1 0.00890344 0.03215733 0.02207007
 ## pctSmokers_c:pctexcessdrinking_c
 pctFDInsecure_c:pctexcessdrinking_c
-## 1 0.0728172 0.03696841
+## 1 0.07492971 0.03678984
 ## pctObese_c:pctSmokers_c:pctFDInsecure_c
 pctObese_c:pctSmokers_c:pctexcessdrinking_c
-## 1 0.005794588 0.01170797
+## 1 0.005751567 0.01184914
 ## pctObese_c:pctFDInsecure_c:pctexcessdrinking_c
 pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
-## 1 0.007866544 0.02157158
+## 1 0.007812194 0.0216648
 ##
 pctObese_c:pctSmokers_c:pctFDInsecure_c:pctexcessdrinking_c
-## 1 0.004222526</code></pre>
+## 1 0.004139416</code></pre>
 <p>The SE in the bootstrapped model has standard errors that are smaller than both the original and robust standard errors that were calculated previously.</p>
 </div>
 <div id="logistic-regression" class="section level1">
